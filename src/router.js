@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
+import Hexmap from './views/Hexmap.vue'
+import Network from './views/Network.vue'
+import Calendar from './views/Calendar.vue'
 
 Vue.use(Router)
 
@@ -8,16 +10,26 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home
+      name: 'map',
+      component: Hexmap
     },
     {
-      path: '/about',
-      name: 'about',
+      path: '/calendar',
+      name: 'calendar',
+      component: Calendar
+    },
+    {
+      path: '/network',
+      name: 'network',
+      component: Network
+    },
+    {
+      path: '/notes',
+      name: 'notes',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      component: () => import(/* webpackChunkName: "about" */ './views/Notes.vue')
     }
   ]
 })

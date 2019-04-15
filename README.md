@@ -1,4 +1,7 @@
-# hexnotes
+# Hexnotes
+
+Just barebones at this point. Added d3 and Bootstrap as I except I'll need them later ...
+
 
 ## Project setup
 ```
@@ -29,6 +32,3 @@ npm run lint
 ```
 npm run test:unit
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
