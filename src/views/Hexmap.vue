@@ -4,7 +4,7 @@
 
 <script>
 import Hexmap from '@/scripts/hexmap.js'
-let worldmap = require('@/assets/worldmap_tall.jpg')
+let worldmap = require('@/assets/worldmap.png')
 // let worldmap = require('@/assets/worldmap.png')
 
 export default {

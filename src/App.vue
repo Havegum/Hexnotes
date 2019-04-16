@@ -33,17 +33,14 @@ body { overflow:hidden }
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
 
   display: flex;
   min-height: 100vh;
   flex-direction: column;
 }
 
-#nav {
-  a.router-link-exact-active {
-    color: white;
-  }
+#nav a.router-link-exact-active {
+  color: white;
 }
 
 #view {
@@ -53,7 +50,6 @@ body { overflow:hidden }
   flex-direction: row;
 
   #main {
-    overflow: auto;
     position: relative;
     flex-grow: 1;
   }

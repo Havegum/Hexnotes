@@ -1,0 +1,57 @@
+{
+  "month_names": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  "week_names": [],
+  "day_names": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ],
+  "years": [
+    {
+      "year": 2019,
+      "month_count": 12,
+      "months": [
+        {
+          "month": "January",
+          "week_count": 4,
+          "weeks": [
+            {
+              "day_count": 7,
+              "days": [
+                {},
+                {
+                  "happenings": [
+                    { "text": "Saint Embers 50th anniversary", "color": "orange" },
+                    { "text": "The golden parade", "color": "orange" },
+                    { "text": "Ember eve", "color": "orange" }
+                  ] },
+                {},
+                {},
+                {},
+                {},
+                {}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
