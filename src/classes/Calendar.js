@@ -26,7 +26,7 @@ class Week {
 
   constructor (options) {
     this.days.lenght = options.day_count
-    for (let i = 0; i < options.days.length; i++) {
+    for (let i = 0; options.days && i < options.days.length; i++) {
       this.days[i] = new Day(options.days[i])
     }
     this.name = options.name
@@ -75,5 +75,7 @@ export default class Calendar {
 
   constructor (options) {
     this.years = options.years.map(y => new Year(y))
+    this.standard_month_names = options.month_names
+    this.standard_day_names = options.day_names
   }
 }

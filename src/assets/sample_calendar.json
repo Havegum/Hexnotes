@@ -50,6 +50,30 @@
               ]
             }
           ]
+        },
+        {
+          "month": "February",
+          "week_count": 4,
+          "weeks": [
+            {},
+            {
+              "day_count": 7,
+              "days": [
+                {},
+                {
+                  "happenings": [
+                    { "text": "Saint Embers 50th anniversary", "color": "orange" },
+                    { "text": "The golden parade", "color": "orange" },
+                    { "text": "Ember eve", "color": "orange" }
+                  ] },
+                {},
+                {},
+                {},
+                {},
+                {}
+              ]
+            }
+          ]
         }
       ]
     }

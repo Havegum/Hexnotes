@@ -1,33 +1,52 @@
 <template>
   <div id="calendar">
     <h1>Calendar</h1>
+
     <div v-for="(month, m) in cal.years[0].months" class="month">
       <h2>{{( month ? month.name : cal.standard_month_names[m] || 'Month ' + (m+1) )}}</h2>
+
       <div v-for="(week, w) in month ? month.weeks : cal.standard_weeks" class="week">
         <div class="week-num label">
           <p v-if="week && week.name">{{ week.name }}</p>
           <p v-else>{{ w+1 + m*(month ? month.weeks.length : cal.standard_weeks) }}</p>
         </div>
-        <div v-for="(day, d) in month && week ? week.days : cal.standard_days" class="day">
-          <p class="label">{{ d+1 + w*(week && week.days ? week.days.length : cal.standard_days) }}</p>
-          <div v-if="day">
-            <p v-for="happening in day.happenings" class="bg-primary text-light pill">{{ happening.text }}</p>
-          </div>
-        </div>
+
+        <Day v-for="(day, d) in month && week && week.days ? week.days : cal.standard_days"
+          :key="d"
+          :d="d"
+          :day="day"
+          :dotm="getDay(w+d)"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Day from '@/components/Day.vue'
 import Calendar from '@/classes/Calendar.js'
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
-  data: function () {
-    return {
-    }
+  name:'calendar',
+  components: {
+    Day
   },
+  methods: {
+    getDay: (function () {
+      let i = 1
+      return n => {
+        if (n==0) i = 1
+        console.log(n);
+        return i++
+      }
+    }())
+  },
+
+  data: function () {
+    return {}
+  },
+
   beforeMount: function () {
     this.cal = new Calendar(sample_calendar)
     console.log(this.cal);
