@@ -9,73 +9,78 @@ class Happening {
 }
 
 class Day {
-  name = undefined
-  happenings = []
+  // name = undefined
+  // happenings = []
 
   constructor (options) {
-    if (options.happenings) {
-      this.happenings = options.happenings.map(h => new Happening(h))
+    if(options) {
+      if (options.happenings) {
+        this.happenings = options.happenings.map(h => new Happening(h))
+      }
+      this.name = options.name
     }
-    this.name = options.name
   }
 }
 
 class Week {
-  name = undefined
-  days = []
+  // name = undefined
+  // days = []
 
-  constructor (options) {
-    this.days.lenght = options.day_count
-    for (let i = 0; options.days && i < options.days.length; i++) {
-      this.days[i] = new Day(options.days[i])
+  constructor (options, stdD) {
+    this.days = Array(options ? options.day_count || stdD : stdD)
+    for (let i = 0; i < this.days.length; i++) {
+      this.days[i] = new Day(options && options.days ? options.days[i] || null : null)
     }
-    this.name = options.name
+    if(options) this.name = options.name
   }
 }
 
 class Month {
-  name = undefined
-  weeks = []
+  // name = undefined
+  // weeks = []
 
-  constructor (options) {
-    this.weeks.length = options.week_count
-    for (var i = 0; i < options.weeks.length; i++) {
-      this.weeks[i] = new Week(options.weeks[i])
+  constructor (options, stdW, stdD) {
+    this.weeks = Array(options ? options.week_count || stdW : stdW)
+    for (let i = 0; i < this.weeks.length; i++) {
+      this.weeks[i] = new Week(options && options.weeks ? options.weeks[i] || null : null, stdD)
     }
-    this.name = options.month
+    if(options) this.name = options.month
   }
 }
 
 class Year {
-  year = 1
+  // year = 1
   // TODO: Should probably be a string
   //       People might want the format: "n-th of *something*"
-  months = []
 
-  constructor (options) {
-    this.months.length = options.month_count
-    for (var i = 0; i < options.months.length; i++) {
-      this.months[i] = new Month(options.months[i])
+  // months = []
+
+  constructor (options, stdM, stdW, stdD) {
+    this.months = Array(options ? options.month_count || stdM : stdM)
+    for (let i = 0; i < this.months.length; i++) {
+      this.months[i] = new Month(options.months[i], stdW, stdD)
     }
-    this.year = options.year
+    if(options) this.year = options.year
   }
 }
 
 export default class Calendar {
   years = []
 
-  standard_months = 12
-  standard_month_names = []
+  standardMonths = 12
+  standardMonthNames = []
 
-  standard_weeks = 4
-  standard_weeks_names = []
+  standardWeeks = 4
+  standardWeeksNames = []
 
-  standard_days = 7
-  standard_days_names = []
+  standardDays = 7
+  standardDaysNames = []
 
   constructor (options) {
-    this.years = options.years.map(y => new Year(y))
-    this.standard_month_names = options.month_names
-    this.standard_day_names = options.day_names
+    this.standardMonthNames = options.month_names
+    this.standardDayNames = options.day_names
+
+    this.years = options.years.map(y => new Year(y, this.standardMonths, this.standardWeeks, this.standardDays))
+    //this.years = options.years.map(y => new Year(y, this.standardMonths, this.standardWeeks, this.standardDays))
   }
 }

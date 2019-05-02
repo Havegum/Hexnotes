@@ -1,17 +1,16 @@
 <template>
   <div id="calendar">
     <h1>Calendar</h1>
+    <div v-for="(month, m) in cal.years[0].months" class="month" :key="m">
+      <h2>{{ month.name || cal.standardMonthNames[m] }}</h2>
 
-    <div v-for="(month, m) in cal.years[0].months" class="month">
-      <h2>{{( month ? month.name : cal.standard_month_names[m] || 'Month ' + (m+1) )}}</h2>
-
-      <div v-for="(week, w) in month ? month.weeks : cal.standard_weeks" class="week">
+      <div v-for="(week, w) in month.weeks" class="week" :key="w">
         <div class="week-num label">
           <p v-if="week && week.name">{{ week.name }}</p>
-          <p v-else>{{ w+1 + m*(month ? month.weeks.length : cal.standard_weeks) }}</p>
+          <p v-else>{{ w+1 + m*(month ? month.weeks.length : cal.standardWeeks) }}</p>
         </div>
 
-        <Day v-for="(day, d) in month && week && week.days ? week.days : cal.standard_days"
+        <Day v-for="(day, d) in week.days /*month && week && week.days ? week.days : cal.standardDays*/"
           :key="d"
           :d="d"
           :day="day"
@@ -28,7 +27,7 @@ import Calendar from '@/classes/Calendar.js'
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
-  name:'calendar',
+  name: 'calendar',
   components: {
     Day
   },
@@ -36,8 +35,7 @@ export default {
     getDay: (function () {
       let i = 1
       return n => {
-        if (n==0) i = 1
-        console.log(n);
+        if (n === 0) i = 1
         return i++
       }
     }())
@@ -49,7 +47,7 @@ export default {
 
   beforeMount: function () {
     this.cal = new Calendar(sample_calendar)
-    console.log(this.cal);
+    console.log(this.cal)
   }
 }
 </script>
@@ -101,21 +99,6 @@ export default {
       writing-mode: sideways;
       text-orientation: sideways;
       flex-grow: 1;
-  }
-  .day {
-    border-right: 1px solid lightgrey;
-    text-align: left;
-    flex-basis: 2em;
-    flex-grow: 10;
-    min-height: 3em;
-
-    &:hover {
-      background-color: lightgray;
-    }
-    p {
-      line-height: 1em;
-      margin-bottom: .5em;
-    }
   }
 }
 </style>

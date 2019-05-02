@@ -36,13 +36,12 @@
               "day_count": 7,
               "days": [
                 {},
+                {},
                 {
                   "happenings": [
-                    { "text": "Saint Embers 50th anniversary", "color": "orange" },
-                    { "text": "The golden parade", "color": "orange" },
-                    { "text": "Ember eve", "color": "orange" }
+                    { "text": "Saint Embers 50th anniversary", "color": "lightgreen" },
+                    { "text": "The golden parade", "color": "orange" }
                   ] },
-                {},
                 {},
                 {},
                 {},
@@ -62,8 +61,6 @@
                 {},
                 {
                   "happenings": [
-                    { "text": "Saint Embers 50th anniversary", "color": "orange" },
-                    { "text": "The golden parade", "color": "orange" },
                     { "text": "Ember eve", "color": "orange" }
                   ] },
                 {},
