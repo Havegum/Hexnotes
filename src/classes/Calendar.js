@@ -1,6 +1,6 @@
 class Happening {
-  text = 'Festival of the sea'
-  color = 'lightblue'
+  // text = 'Festival of the sea'
+  // color = 'lightblue'
 
   constructor (options) {
     this.text = options.text
@@ -9,9 +9,6 @@ class Happening {
 }
 
 class Day {
-  // name = undefined
-  // happenings = []
-
   constructor (options) {
     if(options) {
       if (options.happenings) {
@@ -23,48 +20,61 @@ class Day {
 }
 
 class Week {
-  // name = undefined
-  // days = []
-
   constructor (options, stdD) {
-    this.days = Array(options ? options.day_count || stdD : stdD)
-    for (let i = 0; i < this.days.length; i++) {
-      this.days[i] = new Day(options && options.days ? options.days[i] || null : null)
+    if (options) {
+      this.days = Array(options.day_count || stdD)
+      for (let i = 0; i < this.days.length; i++) {
+        this.days[i] = new Day(options.days ? options.days[i] || null : null)
+      }
+      this.name = options.name
+
+    } else {
+      this.days = Array(stdD)
+      for (let i = 0; i < this.days.length; i++) {
+        this.days[i] = new Day(null)
+      }
     }
-    if(options) this.name = options.name
   }
 }
 
 class Month {
-  // name = undefined
-  // weeks = []
-
   constructor (options, stdW, stdD) {
-    this.weeks = Array(options ? options.week_count || stdW : stdW)
-    for (let i = 0; i < this.weeks.length; i++) {
-      this.weeks[i] = new Week(options && options.weeks ? options.weeks[i] || null : null, stdD)
+    if (options) {
+      this.weeks = Array(options.week_count || stdW)
+      for (let i = 0; i < this.weeks.length; i++) {
+        this.weeks[i] = new Week(options.weeks ? options.weeks[i] || null : null, stdD)
+      }
+      this.name = options.month
+      this.isDrawn = true
+
+    } else {
+      this.weeks = Array(stdW)
+      for (let i = 0; i < this.weeks.length; i++) {
+        this.weeks[i] = new Week(null, stdD)
+      }
     }
-    if(options) this.name = options.month
   }
 }
 
 class Year {
-  // year = 1
-  // TODO: Should probably be a string
-  //       People might want the format: "n-th of *something*"
-
-  // months = []
-
   constructor (options, stdM, stdW, stdD) {
-    this.months = Array(options ? options.month_count || stdM : stdM)
-    for (let i = 0; i < this.months.length; i++) {
-      this.months[i] = new Month(options.months[i], stdW, stdD)
+    if (options) {
+      this.months = Array(options.month_count || stdM)
+      for (let i = 0; i < this.months.length; i++) {
+        this.months[i] = new Month(options.months ? options.months[i] : null || null, stdW, stdD)
+      }
+      this.year = options.year
+
+    } else {
+      this.months = Array(stdM)
+      for (let i = 0; i < this.months.length; i++) {
+        this.months[i] = new Month(null, stdW, stdD)
+      }
     }
-    if(options) this.year = options.year
   }
 }
 
-export default class Calendar {
+class Calendar {
   years = []
 
   standardMonths = 12
@@ -81,6 +91,13 @@ export default class Calendar {
     this.standardDayNames = options.day_names
 
     this.years = options.years.map(y => new Year(y, this.standardMonths, this.standardWeeks, this.standardDays))
-    //this.years = options.years.map(y => new Year(y, this.standardMonths, this.standardWeeks, this.standardDays))
   }
+}
+
+export {
+  Calendar,
+  Year,
+  Month,
+  Week,
+  Day
 }

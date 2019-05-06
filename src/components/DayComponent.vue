@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name:'day',
+  name:'dayomponent',
   props: ['day', 'd', 'dotm']
 }
 </script>
@@ -22,10 +22,11 @@ export default {
   flex-basis: 2em;
   flex-grow: 10;
   min-height: 3em;
-  transition: background-color 100ms;
+  transition: background-color 150ms ease-out;
 
   &:hover {
     background-color: #f0f0f0;
+    transition: none;
   }
   p {
     line-height: 1em;

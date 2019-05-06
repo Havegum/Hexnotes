@@ -1,36 +1,43 @@
 <template>
   <div id="calendar">
     <h1>Calendar</h1>
-    <div v-for="(month, m) in cal.years[0].months" class="month" :key="m">
-      <h2>{{ month.name || cal.standardMonthNames[m] }}</h2>
+    <div v-for="(year, y) in cal.years" :key="y">
+      <h2>{{ year.year }}</h2>
+      <div v-for="(month, m) in year.months" class="month" :key="m">
+        <div v-if="month.isDrawn">
+          <h3>{{ month.name || cal.standardMonthNames[m] }}</h3>
 
-      <div v-for="(week, w) in month.weeks" class="week" :key="w">
-        <div class="week-num label">
-          <p v-if="week && week.name">{{ week.name }}</p>
-          <p v-else>{{ w+1 + m*(month ? month.weeks.length : cal.standardWeeks) }}</p>
+          <div v-for="(week, w) in month.weeks" class="week" :key="w">
+            <div class="week-num label">
+              <p v-if="week.name">{{ week.name }}</p>
+              <p v-else>{{ getWeek(y, week) }}</p>
+            </div>
+
+            <DayComponent v-for="(day, d) in week.days"
+              :key="d"
+              :d="d"
+              :day="day"
+              :dotm="getDay(w+d)"
+            />
+          </div>
         </div>
-
-        <Day v-for="(day, d) in week.days /*month && week && week.days ? week.days : cal.standardDays*/"
-          :key="d"
-          :d="d"
-          :day="day"
-          :dotm="getDay(w+d)"
-        />
       </div>
     </div>
+    <button class="btn btn-primary" type="button" v-on:click="addMonth()">Add month</button>
   </div>
 </template>
 
 <script>
-import Day from '@/components/Day.vue'
-import Calendar from '@/classes/Calendar.js'
+import DayComponent from '@/components/DayComponent.vue'
+import { Calendar, Year, Month, Week, Day } from '@/classes/Calendar.js'
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
   name: 'calendar',
   components: {
-    Day
+    DayComponent
   },
+
   methods: {
     getDay: (function () {
       let i = 1
@@ -38,11 +45,42 @@ export default {
         if (n === 0) i = 1
         return i++
       }
-    }())
+    }()),
+    getWeek: (function () {
+      let i = 1
+      let currentYear = 0
+      return (y, week) => {
+        if (y !== currentYear) {
+          currentYear = y
+          i = 1
+        }
+        week.name = i
+        return i++
+      }
+    }()),
+    addMonth: function () {
+
+      for (let y = 0; y < this.cal.years.length; y++) {
+        let year = this.cal.years[y]
+
+        for (let m = 0; m < year.months.length; m++) {
+          let month = year.months[m]
+          if (!month.isDrawn) {
+            month = Object.assign({}, month, { isDrawn: true }) // required for dynamic state tracking of that month
+            year.months.splice(m, 1, month) // required for dynamic updating of vue list
+            return
+          }
+        }
+
+
+        // this.cal.years.push(new Year('f'))
+
+      }
+    }
   },
 
   data: function () {
-    return {}
+    return { cal: Calendar}
   },
 
   beforeMount: function () {
@@ -99,6 +137,8 @@ export default {
       writing-mode: sideways;
       text-orientation: sideways;
       flex-grow: 1;
+
+      p { margin: 0 }
   }
 }
 </style>
