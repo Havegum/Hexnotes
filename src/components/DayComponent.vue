@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name:'dayomponent',
+  name:'daycomponent',
   props: ['day', 'd', 'dotm']
 }
 </script>

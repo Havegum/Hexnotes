@@ -3,39 +3,24 @@
     <h1>Calendar</h1>
     <div v-for="(year, y) in cal.years" :key="y">
       <h2>{{ year.year }}</h2>
-      <div v-for="(month, m) in year.months" class="month" :key="m">
-        <div v-if="month.isDrawn">
-          <h3>{{ month.name || cal.standardMonthNames[m] }}</h3>
 
-          <div v-for="(week, w) in month.weeks" class="week" :key="w">
-            <div class="week-num label">
-              <p v-if="week.name">{{ week.name }}</p>
-              <p v-else>{{ getWeek(y, week) }}</p>
-            </div>
-
-            <DayComponent v-for="(day, d) in week.days"
-              :key="d"
-              :d="d"
-              :day="day"
-              :dotm="getDay(w+d)"
-            />
-          </div>
-        </div>
-      </div>
+      <MonthComponent v-for="(month, m) in year.months" class="month" :key="m"
+        :month="month" :m="m" :monthName="month.name || cal.standardMonthNames[m]"
+        :year="year" :y="y"/>
     </div>
     <button class="btn btn-primary" type="button" v-on:click="addMonth()">Add month</button>
   </div>
 </template>
 
 <script>
-import DayComponent from '@/components/DayComponent.vue'
+import MonthComponent from '@/components/MonthComponent.vue'
 import { Calendar, Year, Month, Week, Day } from '@/classes/Calendar.js'
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
   name: 'calendar',
   components: {
-    DayComponent
+    MonthComponent
   },
 
   methods: {
@@ -59,9 +44,9 @@ export default {
       }
     }()),
     addMonth: function () {
-
-      for (let y = 0; y < this.cal.years.length; y++) {
-        let year = this.cal.years[y]
+      let cal = this.cal
+      for (let y = 0; y < cal.years.length; y++) {
+        let year = cal.years[y]
 
         for (let m = 0; m < year.months.length; m++) {
           let month = year.months[m]
@@ -71,10 +56,7 @@ export default {
             return
           }
         }
-
-
-        // this.cal.years.push(new Year('f'))
-
+        cal.years.push(new Year({year:'2020'}, cal.standardMonths, cal.standardWeeks, cal.standardDays))
       }
     }
   },
@@ -99,15 +81,6 @@ export default {
   right: 0;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.month {
-  max-width: calc(35em + 20vw);
-  margin: 1.5em auto 0;
-
-  h2 {
-    text-align: left;
-  }
 }
 
 .week {
