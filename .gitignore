@@ -21,3 +21,4 @@ yarn-error.log*
 *.sw?
 *.db
 *.png
+src/assets/worldmap_tall.jpg

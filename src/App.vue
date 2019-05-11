@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <nav id="nav" class="navbar navbar-expand-sm navbar-dark bg-primary">
-      <a class="navbar-brand" href="#">Hexnotes</a>
+      <a class="navbar-brand" href="#">
+         <img src="./assets/logo-white.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+         Hexnotes
+      </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#expandedNavbar" aria-controls="expandedNavbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -18,21 +21,29 @@
       <div id="main">
         <router-view/>
       </div>
-      <aside><p>In the future, there's gonna be a toolbar here</p></aside>
+      <NetworkAside/>
     </div>
   </div>
 </template>
 
 <script>
+import store from './store.js'
+import NetworkAside from '@/views/NetworkAside.vue'
+
+export default {
+  store,
+  components: {
+    NetworkAside
+  }
+}
 </script>
 
 <style lang="scss">
-body { overflow:hidden }
+body { overflow: hidden }
 #app {
   font-family: 'Fira Sans Condensed', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
 
   display: flex;
   min-height: 100vh;
@@ -57,6 +68,7 @@ body { overflow:hidden }
   aside {
     flex-grow: 0;
     background-color: #e3e3e3;
+    max-width: 25%;
   }
 }
 

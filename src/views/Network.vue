@@ -1,28 +1,52 @@
 <template>
-  <div ref='container' class='h-100'>
-    <h1>Network here</h1>
-    <!-- <svg ref='svg' width=200 height=200></svg> -->
+  <div ref='container' class='network h-100'>
+    <h1 v-on:click="increment">Counter: {{ count }}</h1>
+    <!-- <h1>Network here</h1> -->
   </div>
 </template>
+
 <script type="text/javascript">
+import store from '@/store.js'
 import Network from '@/classes/Network.js'
 let lesmis = require('@/assets/miserables.json')
 
 export default {
-  name: 'network',
+  computed: {
+    count () {
+      return this.$store.state.count || 0
+    }
+  },
   methods: {
     test: function () {
       console.log('test')
+    },
+
+    increment: function () {
+      store.commit('increment')
+      this.counter = store.state.count
     }
   },
 
   mounted: function () {
     let chart = new Network(lesmis, this.$refs.container)
-
-    console.log(lesmis)
+    this.counter = store.state.count
+    console.log(store.state.count)
   }
 }
 </script>
-<style media="screen">
-svg {background-color: #222}
+
+<style lang="scss">
+.network {
+  svg { background-color: #222; }
+  h1 {
+    background-color: #222;
+    margin: 0;
+    color: lightgrey;
+    position: absolute;
+    user-select: none;
+  }
+
+  h1:hover, h1:active { color: var(--primary) }
+  h1:active { top: 1px; }
+}
 </style>
