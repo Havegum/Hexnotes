@@ -21,19 +21,27 @@
       <div id="main">
         <router-view/>
       </div>
-      <NetworkAside/>
+      <PersonAside v-if="data && data.isPerson"/>
+      <NetworkAside v-else/>
     </div>
   </div>
 </template>
 
 <script>
-import store from './store.js'
+import store from '@/store.js'
 import NetworkAside from '@/views/NetworkAside.vue'
+import PersonAside from '@/views/PersonAside.vue'
 
 export default {
   store,
+  computed: {
+    data () {
+      return this.$store.state.data || undefined
+    }
+  },
   components: {
-    NetworkAside
+    NetworkAside,
+    PersonAside
   }
 }
 </script>
@@ -69,6 +77,8 @@ body { overflow: hidden }
     flex-grow: 0;
     background-color: #e3e3e3;
     max-width: 25%;
+    width: 100%;
+    padding: .5em;
   }
 }
 

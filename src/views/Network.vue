@@ -8,7 +8,7 @@
 <script type="text/javascript">
 import store from '@/store.js'
 import Network from '@/classes/Network.js'
-let lesmis = require('@/assets/miserables.json')
+let lesmis = require('@/assets/network.json')
 
 export default {
   computed: {

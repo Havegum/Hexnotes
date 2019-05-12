@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import store from '@/store.js'
 
 export default class Network {
   nodes = []
@@ -14,6 +15,8 @@ export default class Network {
     radius = radius || 6
     let nodes = this.nodes = data.nodes.map(d => Object.create(d))
     let links = this.links = data.links.map(d => Object.create(d))
+
+    let color = this.color = d3.scaleOrdinal(d3.schemeCategory10)
 
     let simulation = this.simulation = d3.forceSimulation(nodes)
       .force('link', d3.forceLink(links).strength(.2).id(d => d.id))
@@ -37,6 +40,7 @@ export default class Network {
       .selectAll('g')
       .data(nodes)
       .join('g')
+      .on('click', d => store.commit('data', Object.assign(d.__proto__, {isPerson: true})))
       .call(this.drag(simulation))
 
     node.append('circle')
@@ -45,7 +49,7 @@ export default class Network {
 
     node.append('circle')
       .attr('r', radius)
-      .attr('fill', 'white')
+      .attr("fill", d => color(d.group))
       .attr('stroke', '#2223')
       .attr('stroke-width', 15)
       .append('title')
