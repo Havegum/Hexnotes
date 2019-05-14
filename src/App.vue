@@ -10,10 +10,10 @@
       </button>
       <div id="expandedNavbar" class="collapse navbar-collapse">
         <ul class="navbar-nav">
-          <li class="nav-item"><router-link class="nav-link" to="/">Map</router-link></li>
-          <li class="nav-item"><router-link class="nav-link" to="/calendar">Calendar</router-link></li>
-          <li class="nav-item"><router-link class="nav-link" to="/notes">Notes</router-link></li>
-          <li class="nav-item"><router-link class="nav-link" to="/network">Network</router-link></li>
+          <li class="nav-item"><router-link class="nav-link" to="/"><i class="fas fa-map"></i> Map</router-link></li>
+          <li class="nav-item"><router-link class="nav-link" to="/calendar"><i class="fas fa-calendar-alt"></i> Calendar</router-link></li>
+          <li class="nav-item"><router-link class="nav-link" to="/notes"><i class="fas fa-feather-alt"></i> Notes</router-link></li>
+          <li class="nav-item"><router-link class="nav-link" to="/network"><i class="fab fa-hubspot"></i> Network</router-link></li>
         </ul>
       </div>
     </nav>

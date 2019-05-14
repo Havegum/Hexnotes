@@ -9,9 +9,7 @@ import store from '@/store.js'
 export default {
   name: 'PersonAside',
   computed: {
-    person () {
-      return this.$store.state.data || undefined
-    }
+    person: () => store.state.data || undefined
   }
 }
 </script>
