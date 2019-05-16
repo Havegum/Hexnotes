@@ -1,9 +1,35 @@
 # Hexnotes
+The tools you need to keep track your RPG campaigns!
 
-Just barebones at this point. Added d3 and Bootstrap as I except I'll need them later ...
+## TODO
+- Hexmap
+  - Creating new map
+  - Inspecting a hex
+  - Machine learning autocomplete
+- Notes
+- Network
+  - Setting link strength and type
+  - Colors for factions?
+- Calendar
+  - Design usable interface
+  - Creating a new calendar
+- Inspect sidebars
+  - Person
+  - Hexagon
+  - Day
+  - Journal entry
+- Database
+  - Realtime sync ...
+- Login
+  - Users
+  - Authentication
+  - Access control
 
+A bit ambitious, but I'll probably get further that way.
 
-## Project setup
+## Running the project on your own
+
+### Project setup
 ```
 npm install
 ```
@@ -13,22 +39,17 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
+#### Compiles and minifies for production
 ```
 npm run build
 ```
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
+#### Lints and fixes files
 ```
 npm run lint
 ```
 
-### Run your unit tests
+#### Run your unit tests
 ```
 npm run test:unit
 ```
