@@ -14,7 +14,7 @@
 
 <script>
 import MonthComponent from '@/components/MonthComponent.vue'
-import { Calendar, Year, Month, Week, Day } from '@/classes/Calendar.js'
+import { Calendar, Year /*, Month, Week, Day */ } from '@/classes/Calendar.js'
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
@@ -56,13 +56,13 @@ export default {
             return
           }
         }
-        cal.years.push(new Year({year:'2020'}, cal.standardMonths, cal.standardWeeks, cal.standardDays))
+        cal.years.push(new Year({ year: '2020' }, cal.standardMonths, cal.standardWeeks, cal.standardDays))
       }
     }
   },
 
   data: function () {
-    return { cal: Calendar}
+    return { cal: Calendar }
   },
 
   beforeMount: function () {

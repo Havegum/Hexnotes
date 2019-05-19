@@ -34,7 +34,7 @@ export default {
   },
 
   mounted: function () {
-    let chart = this.chart = new Network(network, this.$refs.container)
+    this.chart = new Network(network, this.$refs.container)
   }
 }
 </script>

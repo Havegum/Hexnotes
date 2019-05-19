@@ -10,7 +10,7 @@ class Happening {
 
 class Day {
   constructor (options) {
-    if(options) {
+    if (options) {
       if (options.happenings) {
         this.happenings = options.happenings.map(h => new Happening(h))
       }
@@ -27,7 +27,6 @@ class Week {
         this.days[i] = new Day(options.days ? options.days[i] || null : null)
       }
       this.name = options.name
-
     } else {
       this.days = Array(stdD)
       for (let i = 0; i < this.days.length; i++) {
@@ -46,7 +45,6 @@ class Month {
       }
       this.name = options.month
       this.isDrawn = true
-
     } else {
       this.weeks = Array(stdW)
       for (let i = 0; i < this.weeks.length; i++) {
@@ -64,7 +62,6 @@ class Year {
         this.months[i] = new Month(options.months ? options.months[i] : null || null, stdW, stdD)
       }
       this.year = options.year
-
     } else {
       this.months = Array(stdM)
       for (let i = 0; i < this.months.length; i++) {

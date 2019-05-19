@@ -1,7 +1,9 @@
 {
   "nodes": [
-    {"id": "The Party", "group": 0, "size": 8},
-    {"id": "Liniel", "group": 1, "size": 4},
+    {"id": "The Party", "group": 0, "size": 8, "description": "This is a general description of the party."},
+    {"id": "Liniel", "group": 1, "size": 4,
+      "data": { "race": "Moon Elf", "age": 46 },
+      "description": "Fleeing Weadren so as to not face the consequences of his actions, Liniel found his way to a new continient for new adventures."},
     {"id": "Rant", "group": 1, "size": 4},
     {"id": "Tsadok", "group": 1, "size": 4},
     {"id": "Murgen", "group": 1, "size": 4},

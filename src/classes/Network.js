@@ -15,13 +15,13 @@ export default class Network {
   selected = null
 
   constructor (data, parent, width, height, radius) {
-    width  = this.width  = width  || parent.scrollWidth
+    width = this.width = width || parent.scrollWidth
     height = this.height = height || parent.scrollHeight
     radius = this.radius = radius || 1
     let nodes = this.nodes = data.nodes.map(d => Object.create(d))
-    let links = this.links = data.links.map(d => Object.create(d))
+    this.links = data.links.map(d => Object.create(d))
 
-    let color = this.color = d3.scaleOrdinal(d3.schemeCategory10)
+    this.color = d3.scaleOrdinal(d3.schemeCategory10)
 
     let svg = this.svg = d3.create('svg')
       .attr('width', width)
@@ -29,7 +29,7 @@ export default class Network {
       .on('click', () => {
         if (!this.editMode) return
 
-        let newNode = Object.create({id:'Unnamed '+ this.unnamed++, group:2, size:2})
+        let newNode = Object.create({ id: 'Unnamed ' + this.unnamed++, group: 2, size: 2 })
         nodes.push(Object.assign(newNode, {
           fx: d3.event.layerX,
           fy: d3.event.layerY
@@ -38,11 +38,11 @@ export default class Network {
         this.update()
       })
 
-    let linkGroup = this.linkGroup = svg.append('g')
+    this.linkGroup = svg.append('g')
       .attr('stroke', '#aaa')
       .attr('stroke-opacity', 0.6)
 
-    let nodeGroup = this.nodeGroup = svg.append('g')
+    this.nodeGroup = svg.append('g')
 
     this.update()
 
@@ -66,15 +66,17 @@ export default class Network {
 
     if (store.state.data) this.selected = store.state.data.id || null
 
-    if(!this.simulation) this.simulation = d3.forceSimulation()
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('charge', d3.forceManyBody()
-        .strength(-30)
-        .distanceMax(100))
+    if (!this.simulation) {
+      this.simulation = d3.forceSimulation()
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('charge', d3.forceManyBody()
+          .strength(-30)
+          .distanceMax(100))
+    }
 
     let simulation = this.simulation
       .nodes(nodes)
-      .force('link', d3.forceLink(links).strength(.1).id(d => d.id))
+      .force('link', d3.forceLink(links).strength(0.1).id(d => d.id))
 
     link = linkGroup
       .selectAll('line')
@@ -91,10 +93,10 @@ export default class Network {
         enter => {
           node = enter.append('g')
             .classed('node', true)
-            .classed('selected', d => d.id == self.selected)
+            .classed('selected', d => d.id === self.selected)
             .call(this.drag(simulation, this))
-            .on('mouseover', d => self.hoverTarget = d )
-            .on('mouseout',  d => self.hoverTarget = self.hoverTarget == d ? null : self.hoverTarget)
+            .on('mouseover', d => { self.hoverTarget = d })
+            .on('mouseout', d => { self.hoverTarget = self.hoverTarget === d ? null : self.hoverTarget })
 
           node.append('circle')
             .attr('r', d => d.size * radius + 4)
@@ -104,14 +106,16 @@ export default class Network {
 
           node.append('circle')
             .attr('r', d => d.size * radius + 2)
-            .attr("fill", d => color(d.group))
+            .attr('fill', d => color(d.group))
             .append('title')
             .text(d => d.id)
 
           if (this.created) {
             node.selectAll('circle')
-              .call(d => d.fx = d.x)
-              .call(d => d.fy = d.y)
+              .call(d => {
+                d.fx = d.x
+                d.fy = d.y
+              })
           }
         }
       )
@@ -141,20 +145,19 @@ export default class Network {
   }
 
   drag (simulation, self) {
-    let newline = undefined
-    let anchor = undefined
+    let newline
+    let anchor
 
     function dragStarted (d) {
-      if (!d3.event.active) simulation.alphaTarget(.5).restart()
+      if (!d3.event.active) simulation.alphaTarget(0.5).restart()
       if (!self.editMode) {
-        d.fx = d.x;
-        d.fy = d.y;
+        d.fx = d.x
+        d.fy = d.y
 
         self.nodeGroup.selectAll('.selected').classed('selected', false)
         d3.select(this).classed('selected', true)
 
-        store.commit('data', Object.assign(d.__proto__, {isPerson: true}))
-
+        store.commit('data', Object.assign(d.__proto__, { isPerson: true }))
       } else {
         anchor = d
         newline = self.linkGroup.append('line')
@@ -190,17 +193,17 @@ export default class Network {
         newline.remove()
         if (!self.hoverTarget) return
         if (self.links.some(link =>
-          link.source.id == self.hoverTarget.id &&
-          link.target.id == d.id ||
-          link.source.id == d.id &&
-          link.target.id == self.hoverTarget.id
+          (link.source.id === self.hoverTarget.id &&
+          link.target.id === d.id) ||
+          (link.source.id === d.id &&
+          link.target.id === self.hoverTarget.id)
         )) return
 
         self.links.push(Object.create({
-            source: d.id,
-            target: self.hoverTarget.id,
-            type: "neutral",
-            value: 2
+          source: d.id,
+          target: self.hoverTarget.id,
+          type: 'neutral',
+          value: 2
         }))
         self.update()
       }
@@ -214,6 +217,6 @@ export default class Network {
 
   setEditMode (editMode) {
     this.editMode = editMode
-    console.log(editMode ? 'Entering' : 'Exiting','edit mode')
+    console.log(editMode ? 'Entering' : 'Exiting', 'edit mode')
   }
 }

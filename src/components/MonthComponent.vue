@@ -22,7 +22,7 @@
 import DayComponent from '@/components/DayComponent.vue'
 
 export default {
-  name:'monthcomponent',
+  name: 'monthcomponent',
   props: ['month', 'm', 'monthName', 'year', 'y'],
 
   components: {
