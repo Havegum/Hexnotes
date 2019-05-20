@@ -1,6 +1,5 @@
 <template>
   <div ref='container' class='network h-100' :class="{ edit: editMode }">
-    <!-- <h1 v-on:click="increment">Counter: {{ count }}</h1> -->
     <button class="btn btn-primary mode-btn" :class="{'btn-success': editMode}" type="button" v-on:click="modeChange">{{
       editMode ? 'Exit Edit Mode' : 'Edit Mode'
     }}</button>
@@ -10,37 +9,44 @@
 <script type="text/javascript">
 import store from '@/store.js'
 import Network from '@/classes/Network.js'
-let network = require('@/assets/network.json') // TODO: Call to database
 
 export default {
   data: function () {
     return {
       editMode: false,
-      chart: {}
+      graph: {}
     }
   },
   computed: {
-    count: () => store.state.count || 0
+    count: () => store.state.count || 0,
+    network: () => store.state.network || { nodes: [], links: [] }
   },
   methods: {
     increment: () => store.commit('increment'),
 
     modeChange: function () {
       this.editMode = !this.editMode
-      this.chart.setEditMode(this.editMode)
-      // console.log(this.editMode ? 'entering' : 'exiting', 'edit mode')
-      // console.log(this.chart)
+      this.graph.setEditMode(this.editMode)
+    },
+
+    fetchNetwork: function () {
+      store.dispatch('getNetwork').then(() =>
+        this.graph.update(true)
+      )
     }
   },
 
   mounted: function () {
-    this.chart = new Network(network, this.$refs.container)
+    this.graph = new Network(this.$refs.container)
+    this.fetchNetwork()
   }
 }
 </script>
 
 <style lang="scss">
 .network {
+  background-color: #222;
+
   .node {
     cursor: grab;
 

@@ -14,10 +14,12 @@ export default class Network {
   unnamed = 1
   selected = null
 
-  constructor (data, parent, width, height, radius) {
+  constructor (parent, width, height, radius) {
     width = this.width = width || parent.scrollWidth
     height = this.height = height || parent.scrollHeight
     radius = this.radius = radius || 1
+
+    let data = store.state.network
     let nodes = this.nodes = data.nodes.map(d => Object.create(d))
     this.links = data.links.map(d => Object.create(d))
 
@@ -51,7 +53,7 @@ export default class Network {
     this.created = true
   }
 
-  update () {
+  update (userUpdate) {
     let self = this
     let node = this.node
     let link = this.link
@@ -61,8 +63,13 @@ export default class Network {
     let width = this.width
     let height = this.height
     let radius = this.radius
-    let nodeGroup = this.nodeGroup
     let linkGroup = this.linkGroup
+
+    // if (userUpdate) {
+    let data = store.state.network
+    nodes = this.nodes = data.nodes.map(d => Object.create(d))
+    links = this.links = data.links.map(d => Object.create(d))
+    // }
 
     if (store.state.data) this.selected = store.state.data.id || null
 
@@ -76,7 +83,7 @@ export default class Network {
 
     let simulation = this.simulation
       .nodes(nodes)
-      .force('link', d3.forceLink(links).strength(0.1).id(d => d.id))
+      .force('link', d3.forceLink(links).strength(d => d.value * .01 + .1).id(d => d.id))
 
     link = linkGroup
       .selectAll('line')
@@ -87,11 +94,11 @@ export default class Network {
           .attr('stroke-width', d => Math.sqrt(d.value))
       )
 
-    nodeGroup.selectAll('g')
+    this.nodeGroup.selectAll('g')
       .data(nodes)
       .join(
         enter => {
-          node = enter.append('g')
+          let node = enter.append('g')
             .classed('node', true)
             .classed('selected', d => d.id === self.selected)
             .call(this.drag(simulation, this))
@@ -110,7 +117,7 @@ export default class Network {
             .append('title')
             .text(d => d.id)
 
-          if (this.created) {
+          if (this.created && !userUpdate) {
             node.selectAll('circle')
               .call(d => {
                 d.fx = d.x
@@ -120,7 +127,7 @@ export default class Network {
         }
       )
 
-    node = this.node = nodeGroup.selectAll('g')
+    node = this.node = this.nodeGroup.selectAll('g')
 
     simulation.on('tick', () => {
       link

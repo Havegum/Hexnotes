@@ -14,7 +14,7 @@
 
 <script>
 import MonthComponent from '@/components/MonthComponent.vue'
-import { Calendar, Year /*, Month, Week, Day */ } from '@/classes/Calendar.js'
+import { Calendar, Year } from '@/classes/Calendar.js' /*, Month, Week, Day */ 
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
