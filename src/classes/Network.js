@@ -14,42 +14,29 @@ export default class Network {
   unnamed = 1
   selected = null
 
-  constructor (parent, width, height, radius) {
-    width = this.width = width || parent.scrollWidth
-    height = this.height = height || parent.scrollHeight
-    radius = this.radius = radius || 1
+  constructor (parent, o) {
+    console.log('constructor called');
+    o = o || {}
+
+    let width = this.width = o.width || parent.scrollWidth
+    let height = this.height = o.height || parent.scrollHeight
+    let radius = this.radius = o.radius || 1
 
     let data = store.state.network
-    let nodes = this.nodes = data.nodes.map(d => Object.create(d))
-    this.links = data.links.map(d => Object.create(d))
 
     this.color = d3.scaleOrdinal(d3.schemeCategory10)
 
-    let svg = this.svg = d3.create('svg')
+    this.svg = d3.create('svg')
       .attr('width', width)
       .attr('height', height)
-      .on('click', () => {
-        if (!this.editMode) return
 
-        let newNode = Object.create({ id: 'Unnamed ' + this.unnamed++, group: 2, size: 2 })
-        nodes.push(Object.assign(newNode, {
-          fx: d3.event.layerX,
-          fy: d3.event.layerY
-        }))
-
-        this.update()
-      })
-
-    this.linkGroup = svg.append('g')
+    this.linkGroup = this.svg.append('g')
       .attr('stroke', '#aaa')
       .attr('stroke-opacity', 0.6)
 
-    this.nodeGroup = svg.append('g')
+    this.nodeGroup = this.svg.append('g')
+    this.node = this.nodeGroup.selectAll('g')
 
-    this.update()
-
-    d3.select(parent).append(() => svg.node())
-    // TODO: return element and do this in vue instead ...
     this.created = true
   }
 
@@ -64,14 +51,25 @@ export default class Network {
     let height = this.height
     let radius = this.radius
     let linkGroup = this.linkGroup
+    let nodeGroup = this.nodeGroup
 
-    // if (userUpdate) {
     let data = store.state.network
     nodes = this.nodes = data.nodes.map(d => Object.create(d))
     links = this.links = data.links.map(d => Object.create(d))
-    // }
 
     if (store.state.data) this.selected = store.state.data.id || null
+
+    this.svg.on('click', () => {
+      if (!this.editMode) return
+      // TODO: Fix
+      let newNode = Object.create({ id: 'Unnamed ' + this.unnamed++, group: 2, size: 2 })
+      self.nodes.push(Object.assign(newNode, {
+        fx: d3.event.layerX,
+        fy: d3.event.layerY
+      }))
+
+      this.update(true)
+    })
 
     if (!this.simulation) {
       this.simulation = d3.forceSimulation()
@@ -94,31 +92,31 @@ export default class Network {
           .attr('stroke-width', d => Math.sqrt(d.value))
       )
 
-    this.nodeGroup.selectAll('g')
+    node = this.node
       .data(nodes)
       .join(
         enter => {
-          let node = enter.append('g')
+          const g = enter.append('g')
             .classed('node', true)
             .classed('selected', d => d.id === self.selected)
             .call(this.drag(simulation, this))
             .on('mouseover', d => { self.hoverTarget = d })
             .on('mouseout', d => { self.hoverTarget = self.hoverTarget === d ? null : self.hoverTarget })
 
-          node.append('circle')
+          g.append('circle')
             .attr('r', d => d.size * radius + 4)
             .attr('fill', '#222')
             .attr('stroke', '#0000')
             .attr('stroke-width', 10)
 
-          node.append('circle')
+          g.append('circle')
             .attr('r', d => d.size * radius + 2)
             .attr('fill', d => color(d.group))
             .append('title')
             .text(d => d.id)
 
           if (this.created && !userUpdate) {
-            node.selectAll('circle')
+            g.selectAll('circle')
               .call(d => {
                 d.fx = d.x
                 d.fy = d.y
@@ -126,9 +124,7 @@ export default class Network {
           }
         }
       )
-
-    node = this.node = this.nodeGroup.selectAll('g')
-
+      
     simulation.on('tick', () => {
       link
         .attr('x1', d => d.source.x)
@@ -136,9 +132,8 @@ export default class Network {
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y)
 
-      node.selectAll('circle')
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
+      nodeGroup.selectAll('g')
+        .attr("transform", d => `translate(${d.x}, ${d.y})`)
     })
   }
 

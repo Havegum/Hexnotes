@@ -9,6 +9,17 @@
         }}</span>
       </li>
     </ul>
+
+    <div class="form__field">
+      <div class="form__input">
+        <swatches
+          v-model="person.color"
+          popover-to="left"
+          show-fallback
+          />
+      </div>
+    </div>
+
     <p>{{ person.description }}</p>
 
     <label for="relation">Relation: {{ relType_txt }}</label>
@@ -26,7 +37,7 @@
       <option>1</option>
       <option>2</option>
     </datalist>
-
+    <!-- TODO: Koordinatsystem -->
     <label for="strength">Relation strength: {{ relStrength_txt }}</label>
     <input id="strength"
       v-model="relStrength"
@@ -47,9 +58,12 @@
 <script>
 import store from '@/store.js'
 import Person from '@/classes/Person.js'
+import Swatches from 'vue-swatches'
+import "vue-swatches/dist/vue-swatches.min.css"
 
 export default {
   name: 'PersonAside',
+  components: { Swatches },
   data: function () {
     return {
       relType: 0,
@@ -60,15 +74,15 @@ export default {
     person: () => new Person(store.state.data),
     relStrength_txt () {
       switch (+this.relStrength) {
-        case 0: return 'Strangers'
-        case 1: return 'Know about'
+        case 0: return 'Stranger'
+        case 1: return 'Aquaintance'
         case 2: return 'Familiar'
-        case 3: return 'Know closely'
+        case 3: return 'Close'
       }
     },
     relType_txt () {
       switch (+this.relType) {
-        case -2: return 'Enemies'
+        case -2: return 'Hostile'
         case -1: return 'Guarded'
         case  0: return 'Neutral'
         case  1: return 'Cordial'
@@ -80,6 +94,9 @@ export default {
 </script>
 
 <style lang="scss">
+aside {
+  position: relative;
+}
 input[type="range"] {
     width: 100%;
     margin: 0;

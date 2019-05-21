@@ -38,6 +38,7 @@ export default {
 
   mounted: function () {
     this.graph = new Network(this.$refs.container)
+    this.$refs.container.appendChild(this.graph.svg.node())
     this.fetchNetwork()
   }
 }

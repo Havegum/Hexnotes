@@ -15,6 +15,8 @@ export default class {
       }
     }
 
+    this.color = data.color || "#E84B3C"
+
     if (data.isParty) {
       this.isParty = true
       delete this.race
