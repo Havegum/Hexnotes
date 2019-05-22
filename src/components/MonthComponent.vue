@@ -59,8 +59,15 @@ export default {
   max-width: calc(35em + 20vw);
   margin: 1.5em auto 0;
 
+  background-color: white;
+
   h3 {
-    text-align: left;
+    text-align: center;
+    font-weight: 600;
+    background-color: var(--info);
+    color: white;
+    padding: .15em 0;
+    margin: 0;
   }
 }
 </style>

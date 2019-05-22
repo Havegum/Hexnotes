@@ -10,14 +10,15 @@
       </li>
     </ul>
 
+    <swatches v-model="person.color" />
     <div class="form__field">
-      <div class="form__input">
+      <!-- <div class="form__input">
         <swatches
           v-model="person.color"
           popover-to="left"
           show-fallback
           />
-      </div>
+      </div> -->
     </div>
 
     <p>{{ person.description }}</p>
@@ -37,7 +38,7 @@
       <option>1</option>
       <option>2</option>
     </datalist>
-    <!-- TODO: Koordinatsystem -->
+    <!-- TODO: Koordinatsystem ??? -->
     <label for="strength">Relation strength: {{ relStrength_txt }}</label>
     <input id="strength"
       v-model="relStrength"
@@ -56,6 +57,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import store from '@/store.js'
 import Person from '@/classes/Person.js'
 import Swatches from 'vue-swatches'
@@ -67,11 +69,12 @@ export default {
   data: function () {
     return {
       relType: 0,
-      relStrength: 1
+      relStrength: 1,
+      person: new Person(store.state.data)
     }
   },
   computed: {
-    person: () => new Person(store.state.data),
+    personObserver: () => new Person(store.state.data),
     relStrength_txt () {
       switch (+this.relStrength) {
         case 0: return 'Stranger'
@@ -89,6 +92,9 @@ export default {
         case  2: return 'Allied'
       }
     }
+  },
+  watch: {
+    personObserver (newPerson) { this.person = newPerson }
   }
 }
 </script>

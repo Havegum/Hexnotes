@@ -14,7 +14,7 @@
 
 <script>
 import MonthComponent from '@/components/MonthComponent.vue'
-import { Calendar, Year } from '@/classes/Calendar.js' /*, Month, Week, Day */ 
+import { Calendar, Year } from '@/classes/Calendar.js' /*, Month, Week, Day */
 let sample_calendar = require('@/assets/sample_calendar.json')
 
 export default {
@@ -81,6 +81,8 @@ export default {
   right: 0;
   overflow-y: auto;
   overflow-x: hidden;
+
+  background-color: lightgrey;
 }
 
 .week {
@@ -88,6 +90,8 @@ export default {
   flex-direction: row;
   position: relative;
   border-bottom: 1px solid #444;
+
+  text-align: center;
 
   &:first-of-type {
     border-top: 1px solid lightgrey;
