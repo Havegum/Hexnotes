@@ -28,10 +28,6 @@ export default class Network {
 
 
     this.simulation = d3.forceSimulation()
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('charge', d3.forceManyBody()
-        .strength(-50)
-        .distanceMax(100))
 
     this.svg = d3.create('svg')
       .attr('width', width)
@@ -44,64 +40,89 @@ export default class Network {
     this.nodeGroup = this.svg.append('g')
     this.node = this.nodeGroup.selectAll('g')
 
+    // this.svg.on('click', () => {
+    //   if (!this.editMode) return
+    //   // TODO: Fix
+    //   let newNode = Object.create({ id: 'Unnamed ' + this.unnamed++, group: 2, size: 2 })
+    //   self.nodes.push(Object.assign(newNode, {
+    //     fx: d3.event.layerX,
+    //     fy: d3.event.layerY
+    //   }))
+    //
+    //   this.update(true)
+    // })
+
     this.created = true
   }
 
-  update (userUpdate, updates) {
-    let links = this.links
+  update (userUpdate) {
+    console.log('graph updated', store.state.network.nodes[0]);
+    let node = this.node
+    let link = this.link
+    let color = this.color
+    let radius = this.radius
 
     let data = store.state.network
-    if (store.state.data && store.state.data.isPeson)
-        this.selected = store.state.data.id || null
+    if (store.state.data) this.selected = store.state.data.id || null
 
-    this.nodes = data.nodes
-    this.links = data.links
+    link = this.linkGroup
+      .selectAll('line')
+      .data(data.links, d => d.source.id + '_' + d.target.id)
 
-    console.log('Graph update triggered' + (updates ? ': ' + updates : ''), this.nodes[0]);
+    link.exit().remove()
 
-    if (typeof updates === 'string') {
-      this.links = this.links.map(l => {
-        if (l.source.id && l.source.id === updates) {
-          l.source = l.source.id
-        } else if (l.target.id && l.target.id === updates) {
-          l.target = l.target.id
-        }
-        return l
-      })
-    }
+    link.enter()
+      .append('line')
+        .attr('stroke', this.colorLink)
+      .merge(link)
+        .attr('stroke-width', d => Math.sqrt(d.value))
 
-    this.simulation
-      .nodes(this.nodes)
-      .force('link', d3.forceLink(this.links)
-        .strength(d => d.value * .1 + 1e-3)
-        .id(d => d.id))
-      .on('tick', () => this.ticked())
+    node = this.nodeGroup.selectAll('g')
+      .data(data.nodes, d => d.id)
+    node.exit().remove()
 
-    console.log('first link', this.links[0]);
+    let newNodes = node.enter()
+      .append('g')
+        .classed('node', true)
+        .classed('selected', d => d.id === self.selected)
+        .call(this.drag(this.simulation, this))
+        .on('mouseover', d => { self.hoverTarget = d })
+        .on('mouseout', d => { self.hoverTarget = self.hoverTarget === d ? null : self.hoverTarget })
 
-    this.link = this.linkGroup.selectAll('line').data(this.links)
-    this.link.exit().remove()
-    this.link.enter().append('line')
-      .attr('stroke-linejoin', 'round')
-    this.linkGroup.selectAll('line')
-      .attr('stroke-width', d => Math.min(d.value, 3) ** 2 / 3 + 1)
-      .attr('stroke', this.colorLink)
-      .filter(d => d.value === 0)
-      .attr('stroke-dasharray', '1,2')
+    newNodes.append('circle')
+      .attr('r', d => (+d.size || 2) * radius + 4)
+      .attr('fill', '#222')
+      .attr('stroke', '#0000')
+      .attr('stroke-width', 10)
 
-    this.node = this.nodeGroup.selectAll('g').data(this.nodes, d => d.id)
-    this.node.exit().remove()
-    this.node.enter().append('g')
-      .call(this.drag(this.simulation, this))
-      .classed('node', true)
-      .append('circle')
+    newNodes.append('circle')
+      .classed('face', true)
+      .append('title')
+      .text(d => d.id)
 
-    this.nodeGroup.selectAll('circle')
-      .attr('fill', d => {
-        if(d.id === 'The Party') console.log('Color:', d)
-        return d.color || this.color(d.group)
-      })
-      .attr('r', d => (+d.size || 2) * this.radius + 4)
+    let allnodes = node.merge(node).selectAll('.face')
+        .attr('r', d => (+d.size || 2) * radius + 2)
+        .attr('fill', d => d.color || color(d.group))
+
+    // if (this.created && !userUpdate) {
+    //   // FIXME: doesn't work ..
+    //   newNodes.selectAll('circle')
+    //     .call(d => {
+    //       d.fx = d.x
+    //       d.fy = d.y
+    //     })
+    // }
+
+    this.simulation.nodes(data.nodes)
+      .force('center', d3.forceCenter(this.width / 2, this.height / 2))
+      .force('charge', d3.forceManyBody()
+        .strength(-1e2)
+        .distanceMax(200))
+      .force('link', d3.forceLink(data.links)
+            .strength(d => d.value * 1e-1 + 1e-1)
+            .id(d => d.id))
+
+    this.simulation.on('tick', () => this.ticked())
   }
 
   ticked () {
@@ -137,8 +158,8 @@ export default class Network {
 
         self.nodeGroup.selectAll('.selected').classed('selected', false)
         d3.select(this).classed('selected', true)
-
         store.commit('data', d)
+        
       } else {
         anchor = d
         newline = self.linkGroup.append('line')

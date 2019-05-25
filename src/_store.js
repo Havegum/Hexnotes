@@ -40,31 +40,29 @@ export default new Vuex.Store({
 
         network.nodes = network.nodes
           .map(d => new Person(d))
-          .map(Object.create)
+          // .map(Object.create)
 
         commit('setNetwork', network)
         return network
       } catch (e) { return state.network }
     },
     async updatePerson ({ commit, state }, person) {
-      let clean_person = {
-        id: person.id,
-        group: person.group,
-        color: person.color,
-        isParty: person.isParty,
-        size: person.size,
-        description: person.description,
-        x: person.x,
-        y: person.y,
+      let clean_person = Object.create({
+        id:          person.id          || state.data.id,
+        group:       person.group       || state.data.group,
+        color:       person.color       || state.data.color,
+        isParty:     person.isParty     || state.data.isParty,
+        size:        person.size        || state.data.size,
+        description: person.description || state.data.description,
+        x:           person.x           || state.data.x,
+        y:           person.y           || state.data.y,
         isPerson: true
-      }
+      })
       console.log('store -> clean_person');
-      commit('updatePerson', Object.create(clean_person))
+      commit('updatePerson', clean_person)
       console.log(clean_person);
-      // await
-        Api().post('/network/person', clean_person)
-          // .then(console.log)
-          // .catch(console.log)
+
+      Api().post('/network/person', clean_person)
 
     }
   }

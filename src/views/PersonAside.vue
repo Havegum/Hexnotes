@@ -1,7 +1,18 @@
 <template>
   <aside>
     <img v-if="person.image">
-    <h1 contenteditable="true" spellcheck="false">{{ person.name }}</h1>
+    <swatches v-model="person.color"
+      class="d-inline-block"
+      background-color="#222"
+      row-length="8"
+      popover-to="left"
+      shapes="circles"
+      swatch-size="30"
+      :trigger-style="{ width: '2em', height: '2em' , marginRight: '0.5em', border: '3px solid darkgrey', position: 'relative', top: '2px'}"
+      show-fallback
+      @input="updateColor">
+    </swatches>
+    <h1 contenteditable="true" spellcheck="false" style="display: inline">{{ person.name }}</h1>
     <ul v-if="person.data" class="person-data">
       <li v-for="(value, key) in person.data" v-bind:key="key">
         {{ key }}:<span contenteditable="true" spellcheck="false" :class="{ unknown: !value }">{{
@@ -10,16 +21,7 @@
       </li>
     </ul>
 
-    <swatches v-model="person.color" />
-    <div class="form__field">
-      <!-- <div class="form__input">
-        <swatches
-          v-model="person.color"
-          popover-to="left"
-          show-fallback
-          />
-      </div> -->
-    </div>
+
 
     <p>{{ person.description }}</p>
 
@@ -95,6 +97,14 @@ export default {
   },
   watch: {
     personObserver (newPerson) { this.person = newPerson }
+  },
+  methods: {
+    updateColor(newColor) {
+      store.dispatch('updatePerson', Object.assign(store.state.data, { color: newColor }))
+      // store.state.data.color = newColor;
+      // let networkNode = store.state.network.nodes.find(d => d.id === store.state.data.id)
+
+    }
   }
 }
 </script>
@@ -118,6 +128,9 @@ datalist {
     padding: 0 7px;
 }
 
+.vue-swatches__wrapper {
+  box-sizing: content-box;
+}
 option {
     display: flex;
     justify-content: center;

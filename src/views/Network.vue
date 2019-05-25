@@ -19,7 +19,30 @@ export default {
   },
   computed: {
     count: () => store.state.count || 0,
-    network: () => store.state.network || { nodes: [], links: [] }
+    network: function () { return store.state.network || { nodes: [], links: [] } },
+    selectedPerson: function () { if (store.state.data && store.state.data.isPerson) return store.state.data; else return null }
+  },
+  watch: {
+    selectedPerson: function (newPerson, oldPerson) {
+      if (!oldPerson) return
+      if (newPerson.id !== oldPerson.id) {
+        console.log('selected new person');
+        console.log('old',oldPerson);
+        console.log('new',newPerson);
+        console.log();
+      } else {
+        console.log('didn\'t select new person:', newPerson.id);
+        console.log('old',oldPerson);
+        console.log('new',newPerson);
+        console.log();
+        this.graph.update(true, newPerson.id)
+        // may call for redundant updates
+        // OPTIMIZE: reduce update calls
+      }
+    },
+    network: function () {
+      console.log('network updated', store.state.network.nodes[0]);
+      this.graph.update(true) }
   },
   methods: {
     increment: () => store.commit('increment'),
