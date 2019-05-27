@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import { Delaunay } from 'd3-delaunay'
 import store from '@/store.js'
 
 export default class Network {
@@ -15,7 +16,6 @@ export default class Network {
   selected = null
 
   constructor (parent, o) {
-    console.log('constructor called');
     o = o || {}
 
     let width = this.width = o.width || parent.scrollWidth
@@ -28,10 +28,13 @@ export default class Network {
 
 
     this.simulation = d3.forceSimulation()
-      .force('center', d3.forceCenter(width / 2, height / 2))
+      // .force('center', d3.forceCenter(width / 2, height / 2))
+      .force('pos_x', d3.forceX(width  / 2).strength(0.1))
+      .force('pos_y', d3.forceY(height / 2).strength(0.1))
+      .force('radial', d3.forceRadial(d => d.inParty ? 15 : 0, width / 2, height / 2).strength(d => d.inParty || d.isParty ? 1 : 0 ))
       .force('charge', d3.forceManyBody()
-        .strength(-50)
-        .distanceMax(100))
+        .strength(d => d.isParty ? 0 : -150)
+        .distanceMax(200))
 
     this.svg = d3.create('svg')
       .attr('width', width)
@@ -43,6 +46,8 @@ export default class Network {
 
     this.nodeGroup = this.svg.append('g')
     this.node = this.nodeGroup.selectAll('g')
+
+    // this.voronoi = this.svg.append('g').classed('voronoi', true)
 
     this.created = true
   }
@@ -57,7 +62,6 @@ export default class Network {
     this.nodes = data.nodes
     this.links = data.links
 
-    console.log('Graph update triggered' + (updates ? ': ' + updates : ''), this.nodes[0]);
 
     if (typeof updates === 'string') {
       this.links = this.links.map(l => {
@@ -68,40 +72,78 @@ export default class Network {
         }
         return l
       })
+    } else if (updates instanceof Array) {
+      console.log('Array updates not implemented');
     }
+
+    let randomWidth  = d3.randomNormal(this.width  / 2, this.width  / 100)
+    let randomHeight = d3.randomNormal(this.height / 2, this.height / 100)
+
+    this.nodes = this.nodes.map(d => {
+      d.x = d.x || randomWidth();
+      d.y = d.y || randomHeight();
+      return d
+    })
 
     this.simulation
       .nodes(this.nodes)
       .force('link', d3.forceLink(this.links)
-        .strength(d => d.value * .1 + 1e-3)
+        .strength(d => d.isParty || d.inParty ? 0 : d.value * .1 + 1e-3)
         .id(d => d.id))
       .on('tick', () => this.ticked())
 
-    console.log('first link', this.links[0]);
 
     this.link = this.linkGroup.selectAll('line').data(this.links)
     this.link.exit().remove()
     this.link.enter().append('line')
-      .attr('stroke-linejoin', 'round')
-    this.linkGroup.selectAll('line')
-      .attr('stroke-width', d => Math.min(d.value, 3) ** 2 / 3 + 1)
+      .merge(this.link)
+      .attr('stroke-width', d => Math.min(d.value, 3) ** 2 / 3 + 2)
       .attr('stroke', this.colorLink)
-      .filter(d => d.value === 0)
-      .attr('stroke-dasharray', '1,2')
+      .attr('stroke-dasharray', d => d.value === 0 ? '2,2' : '')
 
-    this.node = this.nodeGroup.selectAll('g').data(this.nodes, d => d.id)
+    this.node = this.nodeGroup
+      .selectAll('g')
+      .data(this.nodes, d => d.id)
+
     this.node.exit().remove()
-    this.node.enter().append('g')
-      .call(this.drag(this.simulation, this))
-      .classed('node', true)
-      .append('circle')
 
-    this.nodeGroup.selectAll('circle')
-      .attr('fill', d => {
-        if(d.id === 'The Party') console.log('Color:', d)
-        return d.color || this.color(d.group)
-      })
+    let update = this.node.enter()
+      .append('g')
+      .classed('node', true)
+      .call(this.drag(this.simulation, this))
+        .append('circle')
+        .attr('stroke', '#222')
+        .attr('stroke-width', '1.5')
+      .merge(this.node)
+
+    update
+      .select('circle')
+      .attr('fill', d => d.color || this.color(d.group))
       .attr('r', d => (+d.size || 2) * this.radius + 4)
+
+    update
+      .select('circle')
+      .filter(d => d.isParty)
+      .attr('fill', '#0000')
+      .attr('r', 40)
+      .attr('stroke', d => d.color || this.color(d.group))
+      .attr('stroke-width', 2)
+
+    //
+    // let voronoiData = Delaunay.from(this.nodes, d => d.x, d => d.y)
+    //   .voronoi([0, 0, this.width, this.height])
+    //
+    //
+    // this.voronoi.append('path')
+    //   .attr('d', voronoiData.render())
+    //   .attr('stroke', '#fff3')
+    //   .attr('stroke-width', 1)
+
+    //   .data(voronoiData.render())
+    // console.log(voronoiData.render());
+    // this.voronoi.exit().remove()
+    // this.voronoi.enter().append('path')
+
   }
 
   ticked () {

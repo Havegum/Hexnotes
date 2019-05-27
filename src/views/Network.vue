@@ -26,22 +26,16 @@ export default {
     selectedPerson: function (newPerson, oldPerson) {
       if (!oldPerson) return
       if (newPerson.id !== oldPerson.id) {
-        console.log('selected new person');
-        console.log('old',oldPerson);
-        console.log('new',newPerson);
-        console.log();
+        console.log('New person selected:', newPerson.id);
       } else {
-        console.log('didn\'t select new person:', newPerson.id);
-        console.log('old',oldPerson);
-        console.log('new',newPerson);
-        console.log();
+        console.log('Updated person:', newPerson.id);
         this.graph.update(true, newPerson.id)
         // may call for redundant updates
         // OPTIMIZE: reduce update calls
       }
     },
     network: function () {
-      console.log('network updated', store.state.network.nodes[0]);
+      console.log('Network updated');
       this.graph.update(true) }
   },
   methods: {

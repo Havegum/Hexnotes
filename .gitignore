@@ -20,5 +20,5 @@ yarn-error.log*
 *.sln
 *.sw?
 *.db
-*.png
 src/assets/worldmap_tall.jpg
+src/assets/worldmap.png

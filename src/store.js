@@ -7,15 +7,10 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    count: 0,
     data: {},
     network: { nodes: [], links: [] }
   },
   mutations: {
-    increment (state) {
-      state.count++
-    },
-
     data (state, d) {
       state.data = d
     },
@@ -29,7 +24,6 @@ export default new Vuex.Store({
       state.network.nodes[i] = person
       if (state.data.isPerson && state.data.id === person.id) {
         this.commit('data', person);
-        console.log('store updated focus');
       }
     }
   },
@@ -40,7 +34,7 @@ export default new Vuex.Store({
 
         network.nodes = network.nodes
           .map(d => new Person(d))
-          .map(Object.create)
+          // .map(Object.create)
 
         commit('setNetwork', network)
         return network
@@ -52,15 +46,14 @@ export default new Vuex.Store({
         group: person.group,
         color: person.color,
         isParty: person.isParty,
+        inParty: person.inParty,
         size: person.size,
         description: person.description,
         x: person.x,
         y: person.y,
         isPerson: true
       }
-      console.log('store -> clean_person');
-      commit('updatePerson', Object.create(clean_person))
-      console.log(clean_person);
+      commit('updatePerson', clean_person)
       // await
         Api().post('/network/person', clean_person)
           // .then(console.log)

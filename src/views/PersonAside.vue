@@ -55,6 +55,20 @@
       <option>2</option>
       <option>3</option>
     </datalist>
+
+    <label for="strength">Plot importance: {{ plotImportance_txt }}</label>
+    <input id="strength"
+      v-model="plotImportance"
+      type="range"
+      min="0"
+      max="2"
+      step="1"
+      list='strength-list'>
+    <datalist id="strength-list">
+      <option>0</option>
+      <option>1</option>
+      <option>2</option>
+    </datalist>
   </aside>
 </template>
 
@@ -72,6 +86,7 @@ export default {
     return {
       relType: 0,
       relStrength: 1,
+      plotImportance: 2,
       person: new Person(store.state.data)
     }
   },
@@ -93,6 +108,13 @@ export default {
         case  1: return 'Cordial'
         case  2: return 'Allied'
       }
+    },
+    plotImportance_txt () {
+      switch (+this.plotImportance) {
+        case 0: return 'Peripheral'
+        case 1: return 'Unknown'
+        case 2: return 'Central'
+      }
     }
   },
   watch: {
@@ -100,7 +122,9 @@ export default {
   },
   methods: {
     updateColor(newColor) {
-      store.dispatch('updatePerson', Object.assign(store.state.data, { color: newColor }))
+      let person = store.state.data
+      person.color = newColor
+      store.dispatch('updatePerson', person)
       // store.state.data.color = newColor;
       // let networkNode = store.state.network.nodes.find(d => d.id === store.state.data.id)
 

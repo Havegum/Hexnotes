@@ -10,6 +10,9 @@ export default class {
     this.size = data.size
     this.name = data.name || data.id // TODO: ID from database, name to separate field
     this.description = data.description
+    this.inParty = data.inParty;
+    this.x = data.x
+    this.y = data.y
 
     if (data.isParty) {
       this.isParty = true
@@ -24,10 +27,10 @@ export default class {
 
     this.color = data.color || "#E84B3C"
 
-    if (data.isParty) {
-      this.isParty = true
-      delete this.race
-      delete this.age
-    }
+    // if (data.isParty) {
+    //   this.isParty = true
+    //   delete this.race
+    //   delete this.age
+    // }
   }
 }
