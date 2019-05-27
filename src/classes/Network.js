@@ -15,6 +15,11 @@ export default class Network {
   unnamed = 1
   selected = null
 
+  polygon = null
+  centroid = null
+
+  groupScaleFactor = 1.2
+
   constructor (parent, o) {
     o = o || {}
 
@@ -28,7 +33,6 @@ export default class Network {
 
 
     this.simulation = d3.forceSimulation()
-      // .force('center', d3.forceCenter(width / 2, height / 2))
       .force('pos_x', d3.forceX(width  / 2).strength(0.1))
       .force('pos_y', d3.forceY(height / 2).strength(0.1))
       .force('radial', d3.forceRadial(d => d.inParty ? 15 : 0, width / 2, height / 2).strength(d => d.inParty || d.isParty ? 1 : 0 ))
@@ -40,14 +44,16 @@ export default class Network {
       .attr('width', width)
       .attr('height', height)
 
-    this.linkGroup = this.svg.append('g')
+    this.factionContainer = this.svg.append('g')
+      .classed('faction-container', true)
+
+    this.linkContainer = this.svg.append('g')
       .attr('stroke', '#aaa')
+      .classed('node-container', true)
       .attr('stroke-opacity', 0.6)
 
-    this.nodeGroup = this.svg.append('g')
-    this.node = this.nodeGroup.selectAll('g')
-
-    // this.voronoi = this.svg.append('g').classed('voronoi', true)
+    this.nodeContainer = this.svg.append('g')
+      .classed('node-container', true)
 
     this.created = true
   }
@@ -92,8 +98,7 @@ export default class Network {
         .id(d => d.id))
       .on('tick', () => this.ticked())
 
-
-    this.link = this.linkGroup.selectAll('line').data(this.links)
+    this.link = this.linkContainer.selectAll('line').data(this.links)
     this.link.exit().remove()
     this.link.enter().append('line')
       .merge(this.link)
@@ -101,7 +106,7 @@ export default class Network {
       .attr('stroke', this.colorLink)
       .attr('stroke-dasharray', d => d.value === 0 ? '2,2' : '')
 
-    this.node = this.nodeGroup
+    this.node = this.nodeContainer
       .selectAll('g')
       .data(this.nodes, d => d.id)
 
@@ -129,32 +134,72 @@ export default class Network {
       .attr('stroke', d => d.color || this.color(d.group))
       .attr('stroke-width', 2)
 
-    //
-    // let voronoiData = Delaunay.from(this.nodes, d => d.x, d => d.y)
-    //   .voronoi([0, 0, this.width, this.height])
-    //
-    //
-    // this.voronoi.append('path')
-    //   .attr('d', voronoiData.render())
-    //   .attr('stroke', '#fff3')
-    //   .attr('stroke-width', 1)
+    // TODO: get this from the server??
+    this.factionNames = d3.set(this.nodes.map(d => d.group))
+      .values()
+      .filter(name => !!name)
+      .map(faction => { return { name: faction, count: this.nodes.filter(d => d.group == faction).length } })
+      .filter(faction => faction.count > 2)
+      .map(faction => faction.name)
 
-    //   .data(voronoiData.render())
-    // console.log(voronoiData.render());
-    // this.voronoi.exit().remove()
-    // this.voronoi.enter().append('path')
+    console.log(this.factionNames)
+    this.faction = this.factionContainer.selectAll('g')
+      .data(this.factionNames, d => d)
+
+    this.faction.exit().remove()
+    this.faction.enter()
+      .append('g')
+      .append('path')
+      .merge(this.faction)
+      .select('path')
+      .attr('fill', d => d.color || this.color(d))
+      .attr('stroke', d => d.color || this.color(d))
+      .attr('stroke-width', 10)
+      .attr('opacity', 0.3)
 
   }
 
   ticked () {
-    this.linkGroup.selectAll('line')
+    this.linkContainer.selectAll('line')
       .attr('x1', d => d.source.x)
       .attr('y1', d => d.source.y)
       .attr('x2', d => d.target.x)
       .attr('y2', d => d.target.y)
 
-    this.nodeGroup.selectAll('g')
+    this.nodeContainer.selectAll('g')
       .attr("transform", d => `translate(${d.x}, ${d.y})`)
+
+    this.updateGroups()
+  }
+
+  valueline = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveCatmullRomClosed)
+
+  updateGroups () {
+    this.factionNames.forEach(factionName => {
+      let factionPath = this.faction.filter(d => d == factionName)
+        .attr('transform', 'scale(1), translate(0,0)')
+        .select('path')
+        .attr('d', d => {
+          let polygon = this.polygon = this.polygonGenerator(d)
+          let centroid = this.centroid = d3.polygonCentroid(polygon)
+
+          return this.valueline(
+            polygon.map(point =>
+              [ point[0] - centroid[0], point[1] - centroid[1] ]
+            )
+          )
+        })
+      d3.select(factionPath.node().parentNode)
+        .attr('transform', `translate(${this.centroid[0]}, ${this.centroid[1]}) scale(${this.groupScaleFactor})`)
+    })
+  }
+
+  polygonGenerator (factionName) {
+    let node_coordinates = this.node
+      .filter(d => d.group == factionName)
+      .data()
+      .map(d => [d.x, d.y])
+    return d3.polygonHull(node_coordinates)
   }
 
   colorLink (d) {
@@ -177,7 +222,7 @@ export default class Network {
         d.fx = d.x
         d.fy = d.y
 
-        self.nodeGroup.selectAll('.selected').classed('selected', false)
+        self.nodeContainer.selectAll('.selected').classed('selected', false)
         d3.select(this).classed('selected', true)
 
         store.commit('data', d)

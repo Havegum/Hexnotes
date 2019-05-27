@@ -13,6 +13,7 @@ export default class {
     this.inParty = data.inParty;
     this.x = data.x
     this.y = data.y
+    this.group = data.faction || data.group
 
     if (data.isParty) {
       this.isParty = true
