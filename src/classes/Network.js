@@ -25,12 +25,11 @@ export default class Network {
 
     let width = this.width = o.width || parent.scrollWidth
     let height = this.height = o.height || parent.scrollHeight
-    let radius = this.radius = o.radius || 1
+    let radius = this.radius = o.radius || 2
 
     let data = store.state.network
 
     this.color = d3.scaleOrdinal(d3.schemeCategory10)
-
 
     this.simulation = d3.forceSimulation()
       .force('pos_x', d3.forceX(width  / 2).strength(0.1))
@@ -40,20 +39,24 @@ export default class Network {
         .strength(d => d.isParty ? 0 : -150)
         .distanceMax(200))
 
-    this.svg = d3.create('svg')
+    let svg = this.svg = d3.create('svg')
       .attr('width', width)
       .attr('height', height)
 
-    this.factionContainer = this.svg.append('g')
+    this.factionContainer = svg.append('g')
       .classed('faction-container', true)
 
-    this.linkContainer = this.svg.append('g')
+    this.linkContainer = svg.append('g')
       .attr('stroke', '#aaa')
       .classed('node-container', true)
       .attr('stroke-opacity', 0.6)
 
-    this.nodeContainer = this.svg.append('g')
+    this.nodeContainer = svg.append('g')
       .classed('node-container', true)
+
+
+    this.errorContainer = svg.append('g')
+        .classed('error', true)
 
     this.created = true
   }
@@ -65,9 +68,30 @@ export default class Network {
     if (store.state.data && store.state.data.isPeson)
         this.selected = store.state.data.id || null
 
+
+    let errorMessages = []
+    if (data.loading) errorMessages.push('Loading network ...')
+    if (data.loadError) errorMessages.push('Server connection failed')
+
+    let error = this.errorContainer.selectAll('g').data(errorMessages, d => d)
+    error.exit().remove()
+    error.enter()
+      .append('g')
+        .merge(error)
+      .append('rect')
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .attr('opacity', 0.4)
+        .select(function () { return this.parentNode })
+      .append('text')
+        .attr('x', '50%')
+        .attr('y', '50%')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .text(d => d)
+
     this.nodes = data.nodes
     this.links = data.links
-
 
     if (typeof updates === 'string') {
       this.links = this.links.map(l => {
@@ -114,18 +138,23 @@ export default class Network {
 
     let update = this.node.enter()
       .append('g')
-      .classed('node', true)
-      .call(this.drag(this.simulation, this))
-        .append('circle')
+        .classed('node', true)
+        .call(this.drag(this.simulation, this))
+      .append('circle')
         .attr('stroke', '#222')
         .attr('stroke-width', '1.5')
+        .attr('fill', d => d.color || this.color(d.group))
+        .attr('r', d => (d.plotImportance !== undefined ? d.plotImportance : 2) * this.radius + 4)
       .merge(this.node)
 
     update
       .select('circle')
+      .filter(d => !d.isParty)
+      .transition(500)
       .attr('fill', d => d.color || this.color(d.group))
-      .attr('r', d => (+d.size || 2) * this.radius + 4)
+      .attr('r', d => (d.plotImportance !== undefined ? d.plotImportance : 2) * this.radius + 4)
 
+    // TODO: The party is just another faction. Load factions from server.
     update
       .select('circle')
       .filter(d => d.isParty)
@@ -142,7 +171,6 @@ export default class Network {
       .filter(faction => faction.count > 2)
       .map(faction => faction.name)
 
-    console.log(this.factionNames)
     this.faction = this.factionContainer.selectAll('g')
       .data(this.factionNames, d => d)
 
@@ -189,8 +217,10 @@ export default class Network {
             )
           )
         })
-      d3.select(factionPath.node().parentNode)
-        .attr('transform', `translate(${this.centroid[0]}, ${this.centroid[1]}) scale(${this.groupScaleFactor})`)
+      try {
+        d3.select(factionPath.node().parentNode)
+          .attr('transform', `translate(${this.centroid[0]}, ${this.centroid[1]}) scale(${this.groupScaleFactor})`)
+      } catch (e) {}
     })
   }
 

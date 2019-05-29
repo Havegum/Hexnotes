@@ -19,7 +19,7 @@ export default {
   },
   computed: {
     count: () => store.state.count || 0,
-    network: function () { return store.state.network || { nodes: [], links: [] } },
+    network: function () { return store.state.network },
     selectedPerson: function () { if (store.state.data && store.state.data.isPerson) return store.state.data; else return null }
   },
   watch: {
@@ -35,8 +35,8 @@ export default {
       }
     },
     network: function () {
-      console.log('Network updated');
-      this.graph.update(true) }
+      this.graph.update(true)
+    }
   },
   methods: {
     increment: () => store.commit('increment'),
@@ -55,6 +55,7 @@ export default {
 
   mounted: function () {
     this.graph = new Network(this.$refs.container)
+    this.graph.update(true)
     this.$refs.container.appendChild(this.graph.svg.node())
     this.fetchNetwork()
   }
@@ -106,6 +107,15 @@ export default {
 
   h1:hover, h1:active { color: var(--primary) }
   h1:active { top: 1px; }
+
+
+  .error {
+    text {
+      fill: var(--gray);
+      font-size: 2em;
+      font-style: italic;
+    }
+  }
 }
 .mode-btn {
   position: absolute;

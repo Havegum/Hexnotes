@@ -32,7 +32,8 @@
       min="-2"
       max="2"
       step="1"
-      list='relation-list'>
+      list='relation-list'
+      @change="updateRelationType">
     <datalist id="relation-list">
       <option>-2</option>
       <option>-1</option>
@@ -48,7 +49,8 @@
       min="0"
       max="3"
       step="1"
-      list='strength-list'>
+      list='strength-list'
+      @change="updateRelationStrength">
     <datalist id="strength-list">
       <option>0</option>
       <option>1</option>
@@ -63,7 +65,8 @@
       min="0"
       max="2"
       step="1"
-      list='strength-list'>
+      list='strength-list'
+      @input="updateplotImportance">
     <datalist id="strength-list">
       <option>0</option>
       <option>1</option>
@@ -80,7 +83,7 @@ import Swatches from 'vue-swatches'
 import "vue-swatches/dist/vue-swatches.min.css"
 
 export default {
-  name: 'PersonAside',
+  name: 'PersonInspector',
   components: { Swatches },
   data: function () {
     return {
@@ -112,13 +115,16 @@ export default {
     plotImportance_txt () {
       switch (+this.plotImportance) {
         case 0: return 'Peripheral'
-        case 1: return 'Unknown'
+        case 1: return 'Meaningful'
         case 2: return 'Central'
       }
     }
   },
   watch: {
-    personObserver (newPerson) { this.person = newPerson }
+    personObserver (newPerson) {
+      this.person = newPerson
+      this.plotImportance = newPerson.plotImportance
+    }
   },
   methods: {
     updateColor(newColor) {
@@ -128,6 +134,24 @@ export default {
       // store.state.data.color = newColor;
       // let networkNode = store.state.network.nodes.find(d => d.id === store.state.data.id)
 
+    },
+
+    updateRelationType (n) {
+      let person = store.state.data
+      person.color = newColor
+      store.dispatch('updatePerson', person)
+    },
+
+    updateRelationStrength (n) {
+      let person = store.state.data
+      person.color = newColor
+      store.dispatch('updatePerson', person)
+    },
+
+    updateplotImportance (n) {
+      let person = store.state.data
+      person.plotImportance = this.plotImportance
+      store.dispatch('updatePerson', person)
     }
   }
 }

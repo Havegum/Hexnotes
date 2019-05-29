@@ -1,4 +1,4 @@
-export default class {
+export default class Person {
   color = ''
   isParty = false
   isPerson = true
@@ -7,8 +7,8 @@ export default class {
 
   constructor (data) {
     this.id = data.id || data.name
-    this.size = data.size
     this.name = data.name || data.id // TODO: ID from database, name to separate field
+    this.plotImportance = data.plotImportance || data.size
     this.description = data.description
     this.inParty = data.inParty;
     this.x = data.x

@@ -21,16 +21,17 @@
       <div id="main">
         <router-view/>
       </div>
-      <PersonAside v-if="data && data.isPerson"/>
-      <NetworkAside v-else/>
+      <PersonInspector v-if="data && data.isPerson"/>
+      <FactionInspector v-else-if="data && data.isFaction"/>
+      <NetworkInspector v-else/>
     </div>
   </div>
 </template>
 
 <script>
 import store from '@/store.js'
-import NetworkAside from '@/views/NetworkAside.vue'
-import PersonAside from '@/views/PersonAside.vue'
+import NetworkInspector from '@/views/NetworkInspector.vue'
+import PersonInspector from '@/views/PersonInspector.vue'
 
 export default {
   store,
@@ -40,8 +41,8 @@ export default {
     }
   },
   components: {
-    NetworkAside,
-    PersonAside
+    NetworkInspector,
+    PersonInspector
   }
 }
 </script>
