@@ -10,14 +10,14 @@
 export default {
   computed: {
     count () {
-      return this.$store.state.count || 0
+      return this.$store.state.count || 0;
     },
 
     data () {
-      return this.$store.state.data || '{{ empty so far .. }}'
+      return this.$store.state.data || '{{ empty so far .. }}';
     }
   }
-}
+};
 </script>
 
 <style>

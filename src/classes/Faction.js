@@ -6,9 +6,9 @@ export default class Faction {
   isFaction = true
 
   constructor (data) {
-    this.name = data.name
-    this.id = data.id
-    this.color = data.color
-    this.members = data.members
+    this.name = data.name;
+    this.id = data.id;
+    this.color = data.color;
+    this.members = data.members;
   }
 }

@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import Api from '@/Api.js'
-import Person from '@/classes/Person.js'
-import Faction from '@/classes/Faction.js'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import Api from '@/Api.js';
+import Person from '@/classes/Person.js';
+import Faction from '@/classes/Faction.js';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
@@ -13,21 +13,20 @@ export default new Vuex.Store({
   },
   mutations: {
     data (state, d) {
-      state.data = d
+      state.data = d;
     },
 
     setNetwork (state, network) {
-      state.network = network
+      state.network = network;
     },
 
     flagNetwork (state, payload) {
-      if (payload.flag === 'loading' || payload.flag === 'loadError')
-        state.network[payload.flag] = !!payload.value
+      if (payload.flag === 'loading' || payload.flag === 'loadError') { state.network[payload.flag] = !!payload.value }
     },
 
     updatePerson (state, person) {
-      let i = state.network.nodes.findIndex(d => d.id === state.data.id)
-      state.network.nodes[i] = person
+      let i = state.network.nodes.findIndex(d => d.id === state.data.id);
+      state.network.nodes[i] = person;
       if (state.data.isPerson && state.data.id === person.id) {
         this.commit('data', person);
       }
@@ -36,27 +35,26 @@ export default new Vuex.Store({
   actions: {
     async getNetwork ({ commit, state }) {
       try {
-        commit('flagNetwork', { flag: 'loading', value: true })
+        commit('flagNetwork', { flag: 'loading', value: true });
 
-        const network = (await Api().get('/network')).data
-        network.nodes = network.nodes.map(d => new Person(d))
-        network.factions = network.factions.map(d => new Faction(d))
-        network.initiated = true
+        const network = (await Api().get('/network')).data;
+        network.nodes = network.nodes.map(d => new Person(d));
+        network.factions = network.factions.map(d => new Faction(d));
+        network.initiated = true;
 
-        commit('setNetwork', network)
-        commit('flagNetwork', { flag: 'loading', value: false })
-        return network
-
+        commit('setNetwork', network);
+        commit('flagNetwork', { flag: 'loading', value: false });
+        return network;
       } catch (e) {
         console.log('Network request failed', e);
         // TODO: Try again in (5 ** attemps) seconds
-        commit('flagNetwork', { flag: 'loadError', value: true })
-        commit('flagNetwork', { flag: 'loading', value: false })
-        return state.network
+        commit('flagNetwork', { flag: 'loadError', value: true });
+        commit('flagNetwork', { flag: 'loading', value: false });
+        return state.network;
       }
     },
     async updatePerson ({ commit, state }, person) {
-      let clean_person = {
+      let cleanPerson = {
         id: person.id,
         group: person.group,
         color: person.color,
@@ -67,13 +65,12 @@ export default new Vuex.Store({
         x: person.x,
         y: person.y,
         isPerson: true
-      }
-      commit('updatePerson', clean_person)
+      };
+      commit('updatePerson', cleanPerson);
       // await
-        Api().post('/network/person', clean_person)
-          // .then(console.log)
-          // .catch(console.log)
-
+      Api().post('/network/person', cleanPerson);
+      // .then(console.log)
+      // .catch(console.log)
     }
   }
-})
+});

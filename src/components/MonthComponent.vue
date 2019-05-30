@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import DayComponent from '@/components/DayComponent.vue'
+import DayComponent from '@/components/DayComponent.vue';
 
 export default {
   name: 'monthcomponent',
@@ -31,26 +31,26 @@ export default {
 
   methods: {
     getDay: (function () {
-      let i = 1
+      let i = 1;
       return n => {
-        if (n === 0) i = 1
-        return i++
-      }
+        if (n === 0) i = 1;
+        return i++;
+      };
     }()),
     getWeek: (function () {
-      let i = 1
-      let currentYear = 0
+      let i = 1;
+      let currentYear = 0;
       return (y, week) => {
         if (y !== currentYear) {
-          currentYear = y
-          i = 1
+          currentYear = y;
+          i = 1;
         }
-        week.name = i
-        return i++
-      }
+        week.name = i;
+        return i++;
+      };
     }())
   }
-}
+};
 </script>
 
 <style lang="scss">

@@ -29,22 +29,22 @@
 </template>
 
 <script>
-import store from '@/store.js'
-import NetworkInspector from '@/views/NetworkInspector.vue'
-import PersonInspector from '@/views/PersonInspector.vue'
+import store from '@/store.js';
+import NetworkInspector from '@/views/NetworkInspector.vue';
+import PersonInspector from '@/views/PersonInspector.vue';
 
 export default {
   store,
   computed: {
     data () {
-      return this.$store.state.data || undefined
+      return this.$store.state.data || undefined;
     }
   },
   components: {
     NetworkInspector,
     PersonInspector
   }
-}
+};
 </script>
 
 <style lang="scss">

@@ -14,7 +14,7 @@
 export default {
   name: 'daycomponent',
   props: ['day', 'd', 'dotm']
-}
+};
 </script>
 
 <style lang="scss">

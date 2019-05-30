@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Hexmap from './views/Hexmap.vue'
-import Network from './views/Network.vue'
-import Calendar from './views/Calendar.vue'
+import Vue from 'vue';
+import Router from 'vue-router';
+import Hexmap from './views/Hexmap.vue';
+import Network from './views/Network.vue';
+import Calendar from './views/Calendar.vue';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
@@ -32,4 +32,4 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Notes.vue')
     }
   ]
-})
+});

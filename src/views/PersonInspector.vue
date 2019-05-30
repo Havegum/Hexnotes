@@ -21,8 +21,6 @@
       </li>
     </ul>
 
-
-
     <p>{{ person.description }}</p>
 
     <label for="relation">Relation: {{ relType_txt }}</label>
@@ -76,11 +74,10 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import store from '@/store.js'
-import Person from '@/classes/Person.js'
-import Swatches from 'vue-swatches'
-import "vue-swatches/dist/vue-swatches.min.css"
+import store from '@/store.js';
+import Person from '@/classes/Person.js';
+import Swatches from 'vue-swatches';
+import 'vue-swatches/dist/vue-swatches.min.css';
 
 export default {
   name: 'PersonInspector',
@@ -91,70 +88,67 @@ export default {
       relStrength: 1,
       plotImportance: 2,
       person: new Person(store.state.data)
-    }
+    };
   },
   computed: {
     personObserver: () => new Person(store.state.data),
     relStrength_txt () {
       switch (+this.relStrength) {
-        case 0: return 'Stranger'
-        case 1: return 'Aquaintance'
-        case 2: return 'Familiar'
-        case 3: return 'Close'
+        case 0: return 'Stranger';
+        case 1: default: return 'Aquaintance';
+        case 2: return 'Familiar';
+        case 3: return 'Close';
       }
     },
     relType_txt () {
       switch (+this.relType) {
-        case -2: return 'Hostile'
-        case -1: return 'Guarded'
-        case  0: return 'Neutral'
-        case  1: return 'Cordial'
-        case  2: return 'Allied'
+        case -2: return 'Hostile';
+        case -1: return 'Guarded';
+        case 0: default: return 'Neutral';
+        case 1: return 'Cordial';
+        case 2: return 'Allied';
       }
     },
     plotImportance_txt () {
       switch (+this.plotImportance) {
-        case 0: return 'Peripheral'
-        case 1: return 'Meaningful'
-        case 2: return 'Central'
+        case 0: return 'Peripheral';
+        case 1: default: return 'Meaningful';
+        case 2: return 'Central';
       }
     }
   },
   watch: {
     personObserver (newPerson) {
-      this.person = newPerson
-      this.plotImportance = newPerson.plotImportance
+      this.person = newPerson;
+      this.plotImportance = newPerson.plotImportance;
     }
   },
   methods: {
-    updateColor(newColor) {
-      let person = store.state.data
-      person.color = newColor
-      store.dispatch('updatePerson', person)
+    updateColor (newColor) {
+      let person = store.state.data;
+      person.color = newColor;
+      store.dispatch('updatePerson', person);
       // store.state.data.color = newColor;
       // let networkNode = store.state.network.nodes.find(d => d.id === store.state.data.id)
-
     },
 
     updateRelationType (n) {
-      let person = store.state.data
-      person.color = newColor
-      store.dispatch('updatePerson', person)
+      // let person = store.state.data;
+      // store.dispatch('updatePerson', person);
     },
 
     updateRelationStrength (n) {
-      let person = store.state.data
-      person.color = newColor
-      store.dispatch('updatePerson', person)
+      // let person = store.state.data;
+      // store.dispatch('updatePerson', person);
     },
 
     updateplotImportance (n) {
-      let person = store.state.data
-      person.plotImportance = this.plotImportance
-      store.dispatch('updatePerson', person)
+      let person = store.state.data;
+      person.plotImportance = this.plotImportance;
+      store.dispatch('updatePerson', person);
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -182,7 +176,7 @@ datalist {
 option {
     display: flex;
     justify-content: center;
-    align-items: end;
+    align-items: flex-end;
     user-select: none;
     font-size: .8em;
     width: 0;

@@ -7,7 +7,7 @@
 <script>
 export default {
   name: 'factioninspector'
-}
+};
 </script>
 
 <style lang="scss">

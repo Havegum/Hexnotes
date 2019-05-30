@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import MonthComponent from '@/components/MonthComponent.vue'
-import { Calendar, Year } from '@/classes/Calendar.js' /*, Month, Week, Day */
-let sample_calendar = require('@/assets/sample_calendar.json')
+import MonthComponent from '@/components/MonthComponent.vue';
+import { Calendar, Year } from '@/classes/Calendar.js'; /*, Month, Week, Day */
+let _sampleCalendar = require('@/assets/sample_calendar.json');
 
 export default {
   name: 'calendar',
@@ -25,51 +25,51 @@ export default {
 
   methods: {
     getDay: (function () {
-      let i = 1
+      let i = 1;
       return n => {
-        if (n === 0) i = 1
-        return i++
-      }
+        if (n === 0) i = 1;
+        return i++;
+      };
     }()),
     getWeek: (function () {
-      let i = 1
-      let currentYear = 0
+      let i = 1;
+      let currentYear = 0;
       return (y, week) => {
         if (y !== currentYear) {
-          currentYear = y
-          i = 1
+          currentYear = y;
+          i = 1;
         }
-        week.name = i
-        return i++
-      }
+        week.name = i;
+        return i++;
+      };
     }()),
     addMonth: function () {
-      let cal = this.cal
+      let cal = this.cal;
       for (let y = 0; y < cal.years.length; y++) {
-        let year = cal.years[y]
+        let year = cal.years[y];
 
         for (let m = 0; m < year.months.length; m++) {
-          let month = year.months[m]
+          let month = year.months[m];
           if (!month.isDrawn) {
-            month = Object.assign({}, month, { isDrawn: true }) // required for dynamic state tracking of that month
-            year.months.splice(m, 1, month) // required for dynamic updating of vue list
-            return
+            month = Object.assign({}, month, { isDrawn: true }); // required for dynamic state tracking of that month
+            year.months.splice(m, 1, month); // required for dynamic updating of vue list
+            return;
           }
         }
-        cal.years.push(new Year({ year: '2020' }, cal.standardMonths, cal.standardWeeks, cal.standardDays))
+        cal.years.push(new Year({ year: '2020' }, cal.standardMonths, cal.standardWeeks, cal.standardDays));
       }
     }
   },
 
   data: function () {
-    return { cal: Calendar }
+    return { cal: Calendar };
   },
 
   beforeMount: function () {
-    this.cal = new Calendar(sample_calendar)
-    console.log(this.cal)
+    this.cal = new Calendar(_sampleCalendar);
+    console.log(this.cal);
   }
-}
+};
 </script>
 
 <style lang='scss'>

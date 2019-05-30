@@ -7,59 +7,59 @@
 </template>
 
 <script type="text/javascript">
-import store from '@/store.js'
-import Network from '@/classes/Network.js'
+import store from '@/store.js';
+import Network from '@/classes/Network.js';
 
 export default {
   data: function () {
     return {
       editMode: false,
       graph: {}
-    }
+    };
   },
   computed: {
     count: () => store.state.count || 0,
     network: function () { return store.state.network },
-    selectedPerson: function () { if (store.state.data && store.state.data.isPerson) return store.state.data; else return null }
+    selectedPerson: function () { if (store.state.data && store.state.data.isPerson) return store.state.data; else return null; }
   },
   watch: {
     selectedPerson: function (newPerson, oldPerson) {
-      if (!oldPerson) return
+      if (!oldPerson) return;
       if (newPerson.id !== oldPerson.id) {
         console.log('New person selected:', newPerson.id);
       } else {
         console.log('Updated person:', newPerson.id);
-        this.graph.update(true, newPerson.id)
+        this.graph.update(true, newPerson.id);
         // may call for redundant updates
         // OPTIMIZE: reduce update calls
       }
     },
     network: function () {
-      this.graph.update(true)
+      this.graph.update(true);
     }
   },
   methods: {
     increment: () => store.commit('increment'),
 
     modeChange: function () {
-      this.editMode = !this.editMode
-      this.graph.setEditMode(this.editMode)
+      this.editMode = !this.editMode;
+      this.graph.setEditMode(this.editMode);
     },
 
     fetchNetwork: function () {
       store.dispatch('getNetwork').then(() =>
         this.graph.update(true)
-      )
+      );
     }
   },
 
   mounted: function () {
-    this.graph = new Network(this.$refs.container)
-    this.graph.update(true)
-    this.$refs.container.appendChild(this.graph.svg.node())
-    this.fetchNetwork()
+    this.graph = new Network(this.$refs.container);
+    this.graph.update(true);
+    this.$refs.container.appendChild(this.graph.svg.node());
+    this.fetchNetwork();
   }
-}
+};
 </script>
 
 <style lang="scss">
@@ -107,7 +107,6 @@ export default {
 
   h1:hover, h1:active { color: var(--primary) }
   h1:active { top: 1px; }
-
 
   .error {
     text {
