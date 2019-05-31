@@ -32,6 +32,7 @@
 import store from '@/store.js';
 import NetworkInspector from '@/views/NetworkInspector.vue';
 import PersonInspector from '@/views/PersonInspector.vue';
+import FactionInspector from '@/views/FactionInspector.vue';
 
 export default {
   store,
@@ -42,7 +43,8 @@ export default {
   },
   components: {
     NetworkInspector,
-    PersonInspector
+    PersonInspector,
+    FactionInspector
   }
 };
 </script>
@@ -80,6 +82,7 @@ body { overflow: hidden }
     max-width: 25%;
     width: 100%;
     padding: .5em;
+    // TODO: overflow y
   }
 }
 

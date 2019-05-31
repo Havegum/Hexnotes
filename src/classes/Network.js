@@ -18,8 +18,6 @@ export default class Network {
   polygon = null
   centroid = null
 
-  groupScaleFactor = 1.2
-
   constructor (parent, o) {
     o = o || {};
 
@@ -34,7 +32,7 @@ export default class Network {
       .force('pos_y', d3.forceY(height / 2).strength(0.1))
       .force('radial', d3.forceRadial(d => d.inParty ? 15 : 0, width / 2, height / 2).strength(d => d.inParty || d.isParty ? 1 : 0))
       .force('charge', d3.forceManyBody()
-        .strength(d => d.isParty ? 0 : -150)
+        .strength(d => d.isParty || d.isFaction ? 0 : -150)
         .distanceMax(200));
 
     let svg = this.svg = d3.create('svg')
@@ -61,6 +59,7 @@ export default class Network {
   }
 
   update (userUpdate, updates) {
+    let svg = this.svg;
     let data = store.state.network;
     if (store.state.data && store.state.data.isPeson) { this.selected = store.state.data.id || null }
 
@@ -72,35 +71,41 @@ export default class Network {
     error.exit().remove();
     error.enter()
       .append('g')
-      .merge(error)
+        .merge(error)
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('opacity', 0.4)
-      .select(function () { return this.parentNode })
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .attr('opacity', 0.4)
+        .select(function () { return this.parentNode })
       .append('text')
-      .attr('x', '50%')
-      .attr('y', '50%')
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'middle')
-      .text(d => d);
+        .attr('x', '50%')
+        .attr('y', '50%')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .text(d => d);
+
+    if (errorMessages.length > 0) return;
 
     this.nodes = data.nodes;
-    this.links = data.links.filter(d => !d.factionLink);
-    this.factionLinks = data.links.filter(d => d.factionLink);
-    this.factions = data.factions;
+    this.factions = data.factions.filter(faction => faction.members.length >= 3);
+
+    this.links = data.links.filter(d => !d.factionSource && !d.factionTarget);
+    this.factionLinks = data.links.filter(d => d.factionSource || d.factionTarget);
 
     if (typeof updates === 'string') {
-      this.links = this.links.map(l => {
+      let toID = l => {
         if (l.source.id && l.source.id === updates) {
           l.source = l.source.id;
         } else if (l.target.id && l.target.id === updates) {
           l.target = l.target.id;
         }
         return l;
-      });
+      }
+
+      this.links = this.links.map(toID);
+
     } else if (updates instanceof Array) {
-      console.log('Array updates not implemented');
+      console.error('Array updates not implemented yet.');
     }
 
     let randomWidth = d3.randomNormal(this.width / 2, this.width / 100);
@@ -113,10 +118,11 @@ export default class Network {
     });
 
     this.simulation
-      .nodes(this.nodes)
+      .nodes(this.nodes.concat(this.factions))
       .force('link', d3.forceLink(this.links)
         .strength(d => d.isParty || d.inParty ? 0 : d.value * 0.1 + 1e-3)
         .id(d => d.id))
+      .force('factionLink', d3.forceLink(this.factionLinks).strength(0).id(d => d.id))
       .on('tick', () => this.ticked());
 
     this.link = this.linkContainer.selectAll('line').data(this.links);
@@ -135,52 +141,62 @@ export default class Network {
 
     let update = this.node.enter()
       .append('g')
-      .classed('node', true)
-      .call(this.drag(this.simulation, this))
+        .classed('node', true)
+        .call(this.drag(this.simulation, this))
       .append('circle')
-      .attr('stroke', '#222')
-      .attr('stroke-width', '1.5')
-      .attr('fill', d => d.color || this.color(d.group))
-      .attr('r', d => (d.plotImportance !== undefined ? d.plotImportance : 2) * this.radius + 4)
-      .merge(this.node);
+        .attr('stroke', '#222')
+        .attr('stroke-width', '1.5')
+        .attr('fill', d => d.color || this.color(d.group))
+        .attr('r', d => (d.plotImportance !== undefined ? d.plotImportance : 2) * this.radius + 4)
+        .merge(this.node);
 
     update
       .select('circle')
-      .filter(d => !d.isParty)
-      .transition(500)
-      .attr('fill', d => d.color || this.color(d.group))
-      .attr('r', d => (d.plotImportance !== undefined ? d.plotImportance : 2) * this.radius + 4);
+        .filter(d => !d.isParty)
+        .transition(500)
+        .attr('fill', d => d.color || this.color(d.group))
+        .attr('r', d => (d.plotImportance !== undefined ? d.plotImportance : 2) * this.radius + 4);
 
     // TODO: The party is just another faction. Load factions from server.
     update
       .select('circle')
-      .filter(d => d.isParty)
-      .attr('fill', '#0000')
-      .attr('r', 40)
-      .attr('stroke', ''/* d => d.color || this.color(d.group) */)
-      .attr('stroke-width', 2);
-
-    // TODO: get this from the server??
-    this.factionNames = d3.set(this.nodes.map(d => d.group))
-      .values()
-      .filter(name => !!name)
-      .map(faction => { return { name: faction, count: this.nodes.filter(d => d.group === faction).length } })
-      .filter(faction => faction.count > 2)
-      .map(faction => faction.name);
+        .filter(d => d.isParty)
+        .attr('fill', '#0000')
+        .attr('r', 40)
+        .attr('stroke', ''/* d => d.color || this.color(d.group) */)
+        .attr('stroke-width', 2);
 
     this.faction = this.factionContainer.selectAll('g')
-      .data(this.factionNames, d => d);
+      .data(this.factions, d => d.id);
 
     this.faction.exit().remove();
     this.faction.enter()
       .append('g')
       .append('path')
-      .merge(this.faction)
+        .classed('faction', true)
+        .on('click', function (d) {
+          svg.selectAll('.selected').classed('selected', false);
+          d3.select(this).classed('selected', true);
+          console.log(d);
+          store.commit('data', d);
+        })
+        .merge(this.faction)
       .select('path')
-      .attr('fill', d => d.color || this.color(d))
-      .attr('stroke', d => d.color || this.color(d))
-      .attr('stroke-width', 10)
-      .attr('opacity', 0.3);
+        .attr('fill',   d => this.colorGradient(d.color || this.color(d), 0.3))
+        .attr('stroke', d => this.colorGradient(d.color || this.color(d), 0.3));
+
+    this.factionLink = this.factionLinkContainer.selectAll('line')
+      .data(this.factionLinks);
+
+    this.factionLink.exit().remove()
+    this.factionLink.enter()
+      .append('line')
+        .attr('stroke-width', 5)
+        .attr('stroke', '#fff')
+        .merge(this.factionLink)
+        .attr('stroke-width', d => Math.min(d.value, 3) ** 2 / 3 + 2)
+        .attr('stroke', this.colorLink)
+        .attr('stroke-dasharray', d => d.value === 0 ? '2,2' : '');
   }
 
   ticked () {
@@ -194,38 +210,62 @@ export default class Network {
       .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
     this.updateGroups();
+
+    this.factionLinkContainer.selectAll('line')
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
   }
 
-  valueline = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveCatmullRomClosed)
+  valueLine = d3.line().x(d => d[0]).y(d => d[1]).curve(d3.curveCatmullRomClosed)
 
   updateGroups () {
-    this.factionNames.forEach(factionName => {
-      let factionPath = this.faction.filter(d => d === factionName)
-        .attr('transform', 'scale(1), translate(0,0)')
-        .select('path')
+    this.faction
+        .attr('transform', 'translate(0,0)')
+      .select('path')
         .attr('d', d => {
-          let polygon = this.polygon = this.polygonGenerator(d);
-          let centroid = this.centroid = d3.polygonCentroid(polygon);
+          let polygon = this.polygonGenerator(d.id);
+          let centroid = d3.polygonCentroid(polygon);
 
-          return this.valueline(
-            polygon.map(point =>
-              [ point[0] - centroid[0], point[1] - centroid[1] ]
-            )
+          d.x = centroid[0];
+          d.y = centroid[1];
+
+          return this.valueLine(
+            polygon.map(xy => [ xy[0] - centroid[0], xy[1] - centroid[1] ])
           );
-        });
-      try {
-        d3.select(factionPath.node().parentNode)
-          .attr('transform', `translate(${this.centroid[0]}, ${this.centroid[1]}) scale(${this.groupScaleFactor})`);
-      } catch (e) {}
-    });
+        })
+      .select(function () { return this.parentNode })
+        .attr('transform', d => `translate(${d.x},${d.y})`)
   }
 
-  polygonGenerator (factionName) {
+  polygonGenerator (id) {
     let nodeCoordinates = this.node
-      .filter(d => d.group === factionName)
+      .filter(d => d.group === id)
       .data()
       .map(d => [d.x, d.y]);
     return d3.polygonHull(nodeCoordinates);
+  }
+
+  hexToRGB(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+      parseInt(result[1], 16),
+      parseInt(result[2], 16),
+      parseInt(result[3], 16)
+    ] : null;
+  }
+
+  colorGradient (color1, alpha) {
+    let color2 = [34, 34, 34]
+
+    color1 = this.hexToRGB(color1)
+    let w1 = alpha;
+    let w2 = 1 - w1;
+    return 'rgb(' +
+      Math.round(color1[0] * w1 + color2[0] * w2) + ',' +
+      Math.round(color1[1] * w1 + color2[1] * w2) + ',' +
+      Math.round(color1[2] * w1 + color2[2] * w2) + ')';
   }
 
   colorLink (d) {
@@ -248,7 +288,7 @@ export default class Network {
         d.fx = d.x;
         d.fy = d.y;
 
-        self.nodeContainer.selectAll('.selected').classed('selected', false);
+        self.svg.selectAll('.selected').classed('selected', false);
         d3.select(this).classed('selected', true);
 
         store.commit('data', d);

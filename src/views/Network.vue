@@ -73,11 +73,27 @@ export default {
       cursor: grabbing;
     }
 
-    &:hover circle:last-child {
+    &:hover circle {
       stroke: yellow;
       stroke-width: 3;
     }
-    &.selected circle:last-child {
+    &.selected circle {
+      stroke: yellow;
+      stroke-width: 3;
+    }
+  }
+
+  .faction {
+    opacity: 0.9;
+    stroke-width: 20;
+    cursor: pointer;
+
+    &:hover {
+      stroke-width: 30;
+      opacity: 1;
+    }
+
+    &.selected {
       stroke: yellow;
       stroke-width: 3;
     }
