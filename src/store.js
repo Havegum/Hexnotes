@@ -8,26 +8,47 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    data: {},
-    network: { nodes: [], links: [], factions: [], loading: true, loadError: false }
+    inspected: {},
+    persons: [],
+    factions: [],
+    links: [],
+    network: {}
   },
   mutations: {
     data (state, d) {
-      state.data = d;
+      state.inspected = d;
     },
 
-    setNetwork (state, network) {
-      state.network = network;
+    loadNetwork (state, network) {
+      state.network = network.state; // Things break if you remove this line for some reason ...
+      state.links = network.links;
+      state.persons = network.persons;
+      state.factions = network.factions;
+    },
+
+    setPersons (state, persons) {
+      state.persons = persons;
+    },
+
+    setFactions (state, factions) {
+      state.factions = factions;
+    },
+
+    setLinks (state, links) {
+      state.links = links;
     },
 
     flagNetwork (state, payload) {
-      if (payload.flag === 'loading' || payload.flag === 'loadError') { state.network[payload.flag] = !!payload.value }
+      // if (payload.flag === 'loading' || payload.flag === 'loadError') {
+        state.network[payload.flag] = !!payload.value
+      // }
     },
 
     updatePerson (state, person) {
-      let i = state.network.nodes.findIndex(d => d.id === state.data.id);
-      state.network.nodes[i] = person;
-      if (state.data.isPerson && state.data.id === person.id) {
+      let i = state.persons.findIndex(d => d.id === state.inspected.id);
+      state.persons[i] = person;
+
+      if (state.inspected.isPerson && state.inspected.id === person.id) {
         this.commit('data', person);
       }
     }
@@ -38,19 +59,22 @@ export default new Vuex.Store({
         commit('flagNetwork', { flag: 'loading', value: true });
 
         const network = (await Api().get('/network')).data;
-        network.nodes = network.nodes.map(d => new Person(d));
-        network.factions = network.factions.map(d => new Faction(d));
-        network.initiated = true;
 
-        commit('setNetwork', network);
+        commit('loadNetwork', {
+          state:    { instanciated: true },
+          persons:  network.nodes.map(d => new Person(d)),
+          factions: network.factions.map(d => new Faction(d)),
+          links:    network.links
+        })
         commit('flagNetwork', { flag: 'loading', value: false });
-        return network;
+        return;
+
       } catch (e) {
         console.log('Network request failed', e);
         // TODO: Try again in (5 ** attemps) seconds
         commit('flagNetwork', { flag: 'loadError', value: true });
         commit('flagNetwork', { flag: 'loading', value: false });
-        return state.network;
+        return;
       }
     },
     async updatePerson ({ commit, state }, person) {

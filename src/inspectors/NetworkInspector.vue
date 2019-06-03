@@ -14,7 +14,7 @@ export default {
     },
 
     data () {
-      return this.$store.state.data || '{{ empty so far .. }}';
+      return this.$store.state.inspected || '{{ empty so far .. }}';
     }
   }
 };

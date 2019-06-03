@@ -23,7 +23,7 @@
 
     <p>{{ person.description }}</p>
 
-    <label for="relation">Relation: {{ relType_txt }}</label>
+    <label for="relation">Relation: {{ relTypeText }}</label>
     <input id="relation"
       v-model="relType"
       type="range"
@@ -35,12 +35,12 @@
     <datalist id="relation-list">
       <option>-2</option>
       <option>-1</option>
-      <option>0</option>
-      <option>1</option>
-      <option>2</option>
+      <option> 0</option>
+      <option> 1</option>
+      <option> 2</option>
     </datalist>
     <!-- TODO: Koordinatsystem ??? -->
-    <label for="strength">Relation strength: {{ relStrength_txt }}</label>
+    <label for="strength">Relation strength: {{ relStrengthText }}</label>
     <input id="strength"
       v-model="relStrength"
       type="range"
@@ -56,7 +56,7 @@
       <option>3</option>
     </datalist>
 
-    <label for="strength">Plot importance: {{ plotImportance_txt }}</label>
+    <label for="strength">Plot importance: {{ plotImportanceText }}</label>
     <input id="strength"
       v-model="plotImportance"
       type="range"
@@ -64,7 +64,7 @@
       max="2"
       step="1"
       list='strength-list'
-      @input="updateplotImportance">
+      @input="updatePlotImportance">
     <datalist id="strength-list">
       <option>0</option>
       <option>1</option>
@@ -84,15 +84,14 @@ export default {
   components: { Swatches },
   data: function () {
     return {
-      relType: 0,
-      relStrength: 1,
-      plotImportance: 2,
-      person: new Person(store.state.data)
+      relType:        store.state.inspected.relType ||  0,
+      relStrength:    store.state.inspected.relStrength || 1,
+      plotImportance: store.state.inspected.plotImportance || 1,
+      person: new Person(store.state.inspected)
     };
   },
   computed: {
-    personObserver: () => new Person(store.state.data),
-    relStrength_txt () {
+    relStrengthText () {
       switch (+this.relStrength) {
         case 0: return 'Stranger';
         case 1: default: return 'Aquaintance';
@@ -100,7 +99,7 @@ export default {
         case 3: return 'Close';
       }
     },
-    relType_txt () {
+    relTypeText () {
       switch (+this.relType) {
         case -2: return 'Hostile';
         case -1: return 'Guarded';
@@ -109,7 +108,7 @@ export default {
         case 2: return 'Allied';
       }
     },
-    plotImportance_txt () {
+    plotImportanceText () {
       switch (+this.plotImportance) {
         case 0: return 'Peripheral';
         case 1: default: return 'Meaningful';
@@ -117,33 +116,36 @@ export default {
       }
     }
   },
-  watch: {
-    personObserver (newPerson) {
-      this.person = newPerson;
-      this.plotImportance = newPerson.plotImportance;
-    }
+  mounted: function () {
+    this.$store.subscribe((mutation, state) => {
+      switch (mutation.type) {
+        case 'data':
+        case 'inspected':
+          this.person = new Person(state.inspected);
+          this.plotImportance = this.person.plotImportance;
+          break;
+        default:
+
+      }
+    })
   },
   methods: {
     updateColor (newColor) {
-      let person = store.state.data;
+      let person = store.state.inspected;
       person.color = newColor;
       store.dispatch('updatePerson', person);
-      // store.state.data.color = newColor;
-      // let networkNode = store.state.network.nodes.find(d => d.id === store.state.data.id)
     },
 
     updateRelationType (n) {
-      // let person = store.state.data;
-      // store.dispatch('updatePerson', person);
+      console.error('Not implemented');
     },
 
     updateRelationStrength (n) {
-      // let person = store.state.data;
-      // store.dispatch('updatePerson', person);
+      console.error('Not implemented');
     },
 
-    updateplotImportance (n) {
-      let person = store.state.data;
+    updatePlotImportance () {
+      let person = store.state.inspected;
       person.plotImportance = this.plotImportance;
       store.dispatch('updatePerson', person);
     }

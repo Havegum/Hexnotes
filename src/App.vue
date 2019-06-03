@@ -21,8 +21,8 @@
       <div id="main">
         <router-view/>
       </div>
-      <PersonInspector v-if="data && data.isPerson"/>
-      <FactionInspector v-else-if="data && data.isFaction"/>
+      <PersonInspector v-if="inspected.isPerson"/>
+      <FactionInspector v-else-if="inspected.isFaction"/>
       <NetworkInspector v-else/>
     </div>
   </div>
@@ -30,15 +30,15 @@
 
 <script>
 import store from '@/store.js';
-import NetworkInspector from '@/views/NetworkInspector.vue';
-import PersonInspector from '@/views/PersonInspector.vue';
-import FactionInspector from '@/views/FactionInspector.vue';
+import NetworkInspector from '@/inspectors/NetworkInspector.vue';
+import PersonInspector from  '@/inspectors/PersonInspector.vue';
+import FactionInspector from '@/inspectors/FactionInspector.vue';
 
 export default {
   store,
   computed: {
-    data () {
-      return this.$store.state.data || undefined;
+    inspected () {
+      return this.$store.state.inspected || undefined;
     }
   },
   components: {

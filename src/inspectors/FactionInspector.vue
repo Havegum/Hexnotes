@@ -15,11 +15,11 @@ export default {
 
   data: function () {
     return {
-      faction: new Faction(store.state.data)
+      faction: new Faction(store.state.inspected)
     }
   },
   computed: {
-    factionObserver: () => new Faction(store.state.data)
+    factionObserver: () => new Faction(store.state.inspected)
   },
   watch: {
     factionObserver: function (newFaction) {

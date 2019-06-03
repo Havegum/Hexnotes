@@ -17,30 +17,7 @@ export default {
       graph: {}
     };
   },
-  computed: {
-    count: () => store.state.count || 0,
-    network: function () { return store.state.network },
-    selectedPerson: function () { if (store.state.data && store.state.data.isPerson) return store.state.data; else return null; }
-  },
-  watch: {
-    selectedPerson: function (newPerson, oldPerson) {
-      if (!oldPerson) return;
-      if (newPerson.id !== oldPerson.id) {
-        console.log('New person selected:', newPerson.id);
-      } else {
-        console.log('Updated person:', newPerson.id);
-        this.graph.update(true, newPerson.id);
-        // may call for redundant updates
-        // OPTIMIZE: reduce update calls
-      }
-    },
-    network: function () {
-      this.graph.update(true);
-    }
-  },
   methods: {
-    increment: () => store.commit('increment'),
-
     modeChange: function () {
       this.editMode = !this.editMode;
       this.graph.setEditMode(this.editMode);
@@ -58,6 +35,22 @@ export default {
     this.graph.update(true);
     this.$refs.container.appendChild(this.graph.svg.node());
     this.fetchNetwork();
+
+    this.$store.subscribe((mutation, state) => {
+      switch (mutation.type) {
+        case 'updatePerson':
+          this.graph.update(true, state.inspected.id);
+          break;
+        case 'setLinks':
+        case 'setPersons':
+        case 'setFactions':
+        case 'loadNetwork':
+          this.graph.update(true);
+          break;
+        default:
+
+      }
+    })
   }
 };
 </script>

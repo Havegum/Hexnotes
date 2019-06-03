@@ -60,12 +60,13 @@ export default class Network {
 
   update (userUpdate, updates) {
     let svg = this.svg;
-    let data = store.state.network;
-    if (store.state.data && store.state.data.isPeson) { this.selected = store.state.data.id || null }
+    let state = store.state;
+    let network = state.network;
+    if (state.inspected.isPerson) { this.selected = state.inspected.id || null }
 
     let errorMessages = [];
-    if (data.loading) errorMessages.push('Loading network ...');
-    if (data.loadError) errorMessages.push('Server connection failed');
+    if (network.loading) errorMessages.push('Loading network ...');
+    if (network.loadError) errorMessages.push('Server connection failed');
 
     let error = this.errorContainer.selectAll('g').data(errorMessages, d => d);
     error.exit().remove();
@@ -86,11 +87,11 @@ export default class Network {
 
     if (errorMessages.length > 0) return;
 
-    this.nodes = data.nodes;
-    this.factions = data.factions.filter(faction => faction.members.length >= 3);
+    this.nodes = state.persons;
+    this.factions = state.factions //.filter(faction => faction.members.length >= 3);
 
-    this.links = data.links.filter(d => !d.factionSource && !d.factionTarget);
-    this.factionLinks = data.links.filter(d => d.factionSource || d.factionTarget);
+    this.links = state.links.filter(d => !d.factionSource && !d.factionTarget);
+    this.factionLinks = state.links.filter(d => d.factionSource || d.factionTarget);
 
     if (typeof updates === 'string') {
       let toID = l => {
@@ -103,6 +104,7 @@ export default class Network {
       }
 
       this.links = this.links.map(toID);
+      this.factionLinks = this.factionLinks.map(toID);
 
     } else if (updates instanceof Array) {
       console.error('Array updates not implemented yet.');
@@ -244,6 +246,11 @@ export default class Network {
       .filter(d => d.group === id)
       .data()
       .map(d => [d.x, d.y]);
+
+    while (nodeCoordinates.length < 3) {
+        let fakeCoords = nodeCoordinates[nodeCoordinates.length - 1];
+        nodeCoordinates.push(fakeCoords.map(d => ++d));
+    }
     return d3.polygonHull(nodeCoordinates);
   }
 
