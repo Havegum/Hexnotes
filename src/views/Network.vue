@@ -45,12 +45,12 @@ export default {
         case 'setPersons':
         case 'setFactions':
         case 'loadNetwork':
+        case 'updateFaction':
           this.graph.update(true);
           break;
         default:
-
       }
-    })
+    });
   }
 };
 </script>

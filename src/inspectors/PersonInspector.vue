@@ -58,7 +58,7 @@
 
     <label for="strength">Plot importance: {{ plotImportanceText }}</label>
     <input id="strength"
-      v-model="plotImportance"
+      v-model="person.plotImportance"
       type="range"
       min="0"
       max="2"
@@ -84,8 +84,8 @@ export default {
   components: { Swatches },
   data: function () {
     return {
-      relType:        store.state.inspected.relType ||  0,
-      relStrength:    store.state.inspected.relStrength || 1,
+      relType: store.state.inspected.relType || 0,
+      relStrength: store.state.inspected.relStrength || 1,
       plotImportance: store.state.inspected.plotImportance || 1,
       person: new Person(store.state.inspected)
     };
@@ -125,9 +125,8 @@ export default {
           this.plotImportance = this.person.plotImportance;
           break;
         default:
-
       }
-    })
+    });
   },
   methods: {
     updateColor (newColor) {
@@ -146,7 +145,7 @@ export default {
 
     updatePlotImportance () {
       let person = store.state.inspected;
-      person.plotImportance = this.plotImportance;
+      person.plotImportance = this.person.plotImportance;
       store.dispatch('updatePerson', person);
     }
   }

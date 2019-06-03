@@ -40,7 +40,7 @@ export default new Vuex.Store({
 
     flagNetwork (state, payload) {
       // if (payload.flag === 'loading' || payload.flag === 'loadError') {
-        state.network[payload.flag] = !!payload.value
+      state.network[payload.flag] = !!payload.value;
       // }
     },
 
@@ -51,6 +51,10 @@ export default new Vuex.Store({
       if (state.inspected.isPerson && state.inspected.id === person.id) {
         this.commit('data', person);
       }
+    },
+
+    updateFaction (state, faction) {
+      state.faction = faction;
     }
   },
   actions: {
@@ -61,40 +65,29 @@ export default new Vuex.Store({
         const network = (await Api().get('/network')).data;
 
         commit('loadNetwork', {
-          state:    { instanciated: true },
-          persons:  network.nodes.map(d => new Person(d)),
+          state: { instanciated: true },
+          persons: network.nodes.map(d => new Person(d)),
           factions: network.factions.map(d => new Faction(d)),
-          links:    network.links
-        })
+          links: network.links
+        });
         commit('flagNetwork', { flag: 'loading', value: false });
         return;
-
       } catch (e) {
         console.log('Network request failed', e);
         // TODO: Try again in (5 ** attemps) seconds
         commit('flagNetwork', { flag: 'loadError', value: true });
         commit('flagNetwork', { flag: 'loading', value: false });
-        return;
       }
     },
     async updatePerson ({ commit, state }, person) {
-      let cleanPerson = {
-        id: person.id,
-        group: person.group,
-        color: person.color,
-        isParty: person.isParty,
-        inParty: person.inParty,
-        plotImportance: person.plotImportance || person.size,
-        description: person.description,
-        x: person.x,
-        y: person.y,
-        isPerson: true
-      };
-      commit('updatePerson', cleanPerson);
-      // await
-      Api().post('/network/person', cleanPerson);
-      // .then(console.log)
-      // .catch(console.log)
+      person = new Person(person);
+      commit('updatePerson', person);
+      Api().post('/network/person', person);
+    },
+
+    async updateFaction ({ commit, state }, faction) {
+      commit('updateFaction', new Faction(faction));
+      // Api().post('/') // TODO:
     }
   }
 });

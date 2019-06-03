@@ -5,7 +5,7 @@ export default class Faction {
   members
   isFaction = true
   description
-  
+
   constructor (data) {
     this.name = data.name;
     this.id = data.id;

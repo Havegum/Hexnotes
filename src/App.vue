@@ -12,8 +12,9 @@
         <ul class="navbar-nav">
           <li class="nav-item"><router-link class="nav-link" to="/"><i class="fas fa-map"></i> Map</router-link></li>
           <li class="nav-item"><router-link class="nav-link" to="/calendar"><i class="fas fa-calendar-alt"></i> Calendar</router-link></li>
-          <li class="nav-item"><router-link class="nav-link" to="/notes"><i class="fas fa-feather-alt"></i> Notes</router-link></li>
+          <li class="nav-item"><router-link class="nav-link disabled" to="/notes"><i class="fas fa-feather-alt"></i> Notes</router-link></li>
           <li class="nav-item"><router-link class="nav-link" to="/network"><i class="fab fa-hubspot"></i> Network</router-link></li>
+          <li class="nav-item"><router-link class="nav-link disabled" to="/inventory"><i class="fas fa-box"></i> Inventory</router-link></li>
         </ul>
       </div>
     </nav>
@@ -31,7 +32,7 @@
 <script>
 import store from '@/store.js';
 import NetworkInspector from '@/inspectors/NetworkInspector.vue';
-import PersonInspector from  '@/inspectors/PersonInspector.vue';
+import PersonInspector from '@/inspectors/PersonInspector.vue';
 import FactionInspector from '@/inspectors/FactionInspector.vue';
 
 export default {
